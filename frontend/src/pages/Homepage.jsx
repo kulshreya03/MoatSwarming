@@ -1,11 +1,19 @@
+import { useNavigate } from "react-router-dom"
 
 
 
 export function Homepage()
 {
+    const navigate=useNavigate()
+
+    function handleClick()
+    {
+        navigate("/UserLogin")
+    }
+
     return(
         <div>
-            <button>Student Login</button>                
+            <button onClick={handleClick}>Student Login</button>                
 
         </div>
     )
