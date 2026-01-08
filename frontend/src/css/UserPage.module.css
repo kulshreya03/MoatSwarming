@@ -1,0 +1,64 @@
+.page {
+  min-height: 100%;
+  width: 100%;
+  padding: 56px 72px;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+}
+
+/* Headings */
+.header {
+  font-size: 46px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.subHeader {
+  font-size: 24px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 48px;
+  max-width: 900px;
+}
+
+/* Upload card */
+.card {
+  width: 100%;
+  max-width: 520px;
+  padding: 30px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+}
+
+/* Label */
+.label {
+  display: block;
+  font-size: 19px;
+  margin-bottom: 18px;
+}
+
+/* File input */
+.inputFile {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Optional hover polish */
+.inputFile:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
