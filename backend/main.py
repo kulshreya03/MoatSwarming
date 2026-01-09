@@ -15,3 +15,6 @@ async def read_root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+from routes import database_auth_routes
+app.include_router(database_auth_routes.router)

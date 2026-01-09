@@ -4,12 +4,14 @@ import styles from "../css/Userlogin.module.css";
 
 export function UserLogin() {
   const navigate=useNavigate()
-  const [gmail,setGmail]=useState("")
-  const [password,setPassword]=useState("")  
+  const [email,setEmail]=useState("")
+  const [password,setPassword]=useState("")
+  const[error,setError]=useState("")  
+  //const BACKEND_URL = "http://localhost:8000";
 
-  function handleGmail(event)
+  function handleEmail(event)
   {
-    setGmail(event.target.value)
+    setEmail(event.target.value)
   }
 
   function handlePassword(event)
@@ -17,13 +19,41 @@ export function UserLogin() {
     setPassword(event.target.value)
   }
 
-  function handleSubmit(event)
+  async function handleSubmit(event)
   {
     event.preventDefault();
     //Api Call Here to fetch database and validate 
-    if(password=="Ansh" && gmail=="Ansh")
+    setError("");
+
+    if(!email || !password) 
     {
-        navigate("/UserPage")
+      setError("Please fill all the fields");
+      return;
+    }
+
+    try
+    {
+      const response = await fetch("http://localhost:8000" + "/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || "Login failed");
+      }
+
+      const user = await response.json(); //User id
+      localStorage.setItem("user", JSON.stringify(user)); //Token
+
+      navigate("/UserPage");
+    }
+    catch (error)
+    {
+      setError(error.message);
     }
   }
 
@@ -35,10 +65,10 @@ export function UserLogin() {
 
         <input
           type="text"
-          placeholder="Enter your Gmail"
+          placeholder="Enter your Email"
           className={styles.input}
-          value={gmail}
-          onChange={handleGmail}
+          value={email}
+          onChange={handleEmail}
         />
 
         <input
@@ -48,6 +78,9 @@ export function UserLogin() {
           value={password}
           onChange={handlePassword}
         />
+
+        {error && <div className={styles.error}>{error}</div>}
+
 
         <button className={styles.button} onClick={handleSubmit}>Login</button>
       </div>
