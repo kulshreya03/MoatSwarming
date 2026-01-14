@@ -1,3 +1,64 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+*.log
+
+# Django stuff
+db.sqlite3
+media/
+staticfiles/
+
+# Flask/FastAPI
+instance/
+
+# Migrations cache
+*.sqlite3
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Type checking
+.mypy_cache/
+.pyright/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+# Alembic
+alembic/versions/
+
+
+
+#Frontend
+
 # Logs
 logs
 *.log
