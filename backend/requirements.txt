@@ -5,3 +5,8 @@ psycopg2-binary
 alembic
 dotenv
 pydantic
+langchain
+langgraph
+langchain-google-genai
+python-multipart 
+PyPDF2
