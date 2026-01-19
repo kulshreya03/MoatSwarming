@@ -5,11 +5,15 @@
 }
 
 html,
-body,
-#root {
+body {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#root {
+  min-height: 100%;
 }
 
 /* ❌ REMOVE any flex centering from #root */

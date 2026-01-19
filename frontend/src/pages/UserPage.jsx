@@ -55,23 +55,39 @@ export function UserPage() {
             className={styles.inputFile}
             onChange={handleFileChange}
           />
-          <button type="submit" disabled={loading}>
-            {loading ? "Analyzing..." : "Extract Skills"}
-          </button>
+          <button
+          type="submit"
+          disabled={loading}
+          className={styles.button}
+          >
+          {loading ? "Analyzing…" : "Extract Skills"}
+        </button>
         </form>
 
-        {Object.entries(skills).map(([category, items]) => (
-          items.length > 0 && (
-            <div key={category}>
-              <h5>{category.toUpperCase()}</h5>
-              <ul>
-                {items.map((skill, i) => (
-                  <li key={i}>{skill}</li>
-                ))}
-              </ul>
-            </div>
-          )
-        ))}
+
+          {Object.entries(skills).length > 0 && (
+         <div className={styles.skillsGrid}>
+          {Object.entries(skills).map(([category, items]) =>
+            items.length > 0 ? (
+              <div key={category} className={styles.skillCard}>
+                <h5 className={styles.skillTitle}>
+                  {category.replace("_", " ").toUpperCase()}
+                </h5>
+
+                <div className={styles.skillPills}>
+                  {items.map((skill, i) => (
+              <span key={i} className={styles.skillPill}>
+                {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null
+          )}
+  </div>
+)}
+
+        
         
       </div>
 
