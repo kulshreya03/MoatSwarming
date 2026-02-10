@@ -1,0 +1,134 @@
+1️⃣ users
+
+Purpose: Stores all platform users (students & admins)
+
+Why needed:
+
+Identifies who uploads resumes
+
+Identifies who gets tasks assigned
+
+Distinguishes admin vs student behavior
+
+2️⃣ resumes
+
+Purpose: Stores raw and parsed resume data
+
+Why needed:
+
+Keeps original resume text for re-processing
+
+Stores structured skill extraction (JSONB)
+
+Acts as the source of truth for user skills & domain
+
+3️⃣ skills
+
+Purpose: Master list of all known skills
+
+Why needed:
+
+Avoids duplicate skill names (Python vs python)
+
+Enables normalization and clean joins
+
+Allows consistent skill matching across users & tasks
+
+4️⃣ user_skills
+
+Purpose: Maps users to their skills with proficiency
+
+Why needed:
+
+Stores who knows what
+
+Tracks skill level (beginner/intermediate/advanced)
+
+Used directly by the skill-matching agent
+
+5️⃣ projects
+
+Purpose: Represents high-level real-world projects
+
+Why needed:
+
+Groups related work under one project
+
+Defines domain and complexity
+
+Allows admins to manage large initiatives
+
+6️⃣ modules
+
+Purpose: Breaks projects into logical components
+
+Why needed:
+
+Makes large projects assignable
+
+Enables parallel contribution
+
+Natural boundary for agent-driven task creation
+
+7️⃣ tasks
+
+Purpose: Smallest assignable unit of work
+
+Why needed:
+
+This is what students actually work on
+
+Tracks task status (pending / assigned / completed)
+
+Used for skill matching and recommendation
+
+8️⃣ task_skills
+
+Purpose: Defines skill requirements for each task
+
+Why needed:
+
+Enables skill ↔ task compatibility checks
+
+Supports required vs optional skills
+
+Supports minimum proficiency constraints
+
+9️⃣ task_assignments
+
+Purpose: Tracks which user is assigned to which task
+
+Why needed:
+
+Prevents double assignment
+
+Tracks progress & submission status
+
+Enables performance analytics later
+
+
+
+
+🧠 Agent Perspective Summary
+Agent	                            Tables Used
+Resume Parsing Agent	            resumes, skills, user_skills
+Project Decomposition Agent	        projects, modules, tasks, task_skills
+Skill Matching Agent	            user_skills, task_skills, tasks
+Assignment Agent	                task_assignments, tasks
+
+
+Social Media Analytics Dashboard
+1. Backend API Module (FastAPI)
+REST endpoints
+Auth & roles
+2. Dashboard UI Module (React)
+Charts
+Filters & date ranges
+
+Fitness Tracking Web + Mobile App
+1. User Profile & Auth
+Health info
+Login
+2. Mobile App Module (Flutter)
+Daily tracking
+Notifications
