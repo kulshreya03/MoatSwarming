@@ -47,8 +47,8 @@ Resume Text:
 {resume_text}
 
 Return EXACT JSON STRUCTURE:
-{
-"skills": {
+{{
+"skills": {{
 "languages": [],
 "frameworks": [],
 "libraries": [],
@@ -57,9 +57,9 @@ Return EXACT JSON STRUCTURE:
 "devops": [],
 "tools": [],
 "concepts": []
-},
+}},
 "domain": ""
-}
+}}
 """
 
     '''prompt = f"""
