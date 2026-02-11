@@ -1,8 +1,10 @@
 import styles from "../css/UserPage.module.css";
+import { useNavigate } from "react-router";
 import { useState } from "react";
 
 export function UserPage() {
 
+  const navigate=useNavigate()
   const [file, setFile] = useState(null);
   const [skills, setSkills] = useState({});
   const [loading, setLoading] = useState(false);
@@ -62,6 +64,17 @@ export function UserPage() {
           >
           {loading ? "Analyzing…" : "Extract Skills"}
         </button>
+
+        <button
+        type="button"
+        onClick={() => {
+          navigate('/TasksPage')
+        }}
+        className={styles.secondaryButton}
+        >
+        View Tasks
+        </button>
+
         </form>
 
 

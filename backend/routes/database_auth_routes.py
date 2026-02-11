@@ -4,12 +4,10 @@ from typing import Annotated
 from database.database import SessionLocal, engine
 import database.models as models
 from sqlalchemy.orm import Session
-
 from pydantic import EmailStr
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 models.Base.metadata.create_all(bind=engine)
-
 
 class LoginRequest(BaseModel):
     email: str
@@ -44,4 +42,3 @@ async def login(request: LoginRequest, db: db_dependency):
         }
 
     #return LoginResponse(id=user.id, name=user.name, email=user.email)
-

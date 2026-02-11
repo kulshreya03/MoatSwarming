@@ -48,7 +48,7 @@ export function UserLogin() {
 
       const user = await response.json(); //User id
       localStorage.setItem("user", JSON.stringify(user)); //Token
-
+      
       navigate("/UserPage");
     }
     catch (error)
