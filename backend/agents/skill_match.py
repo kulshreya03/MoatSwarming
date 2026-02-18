@@ -19,19 +19,23 @@ def get_db():
 
 
 def match_skills_to_tasks(db:Session):
-    tasks = db.query(models.ProjectTasks).all()
+
+    #Check if status is pending, display task only if status:pending
+    tasks = db.query(models.ProjectTasks).filter(models.ProjectTasks.status == "pending").all()
     #print(tasks)
 
     # Convert tasks to list
     task_list = []
     for task in tasks:
-        task_list.append({
-            "task_id": task.task_id,
-            "project_id": task.project_id,
-            "task_description": task.task_description,
-            "github_repo": task.github_repo,
-            "status": task.status
-        })
+            task_list.append({
+                "task_id": task.task_id,
+                "project_id": task.project_id,
+                "task_description": task.task_description,
+                "github_repo": task.github_repo,
+                "status": task.status
+            })    
+
+
     #print(task_list)
 
     resume_skills = state["resume_skills"]
