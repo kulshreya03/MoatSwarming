@@ -7,7 +7,7 @@
   color: #ffffff;
 
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, sans-serif;
+  Roboto, sans-serif;
 
   overflow-y: auto;
 }
@@ -38,6 +38,10 @@
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
 
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card:hover {
@@ -87,14 +91,13 @@
   opacity: 0.9;
 }
 
-/* Skill Pills Container */
+/* Skill Pills */
 .skillPills {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-/* Individual Skill Pill */
 .skillPill {
   padding: 6px 12px;
   border-radius: 999px;
@@ -108,6 +111,48 @@
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* Submit Button */
+.submitButton {
+  margin-top: 24px;
+  width: 100%;
+  height: 48px;
+
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  color: white;
+
+  background: linear-gradient(
+    135deg,
+    #3b82f6 0%,
+    #2563eb 100%
+  );
+
+  box-shadow:
+    0 10px 25px rgba(37, 99, 235, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  transition: all 0.18s ease;
+}
+
+.submitButton:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 40px rgba(37, 99, 235, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.submitButton:active {
+  transform: translateY(0);
+  box-shadow:
+    0 6px 18px rgba(37, 99, 235, 0.4);
 }
 
 /* Empty State */

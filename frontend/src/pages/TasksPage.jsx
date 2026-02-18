@@ -1,7 +1,5 @@
-import styles from "../css/TasksPage.module.css"
-
+import styles from "../css/TasksPage.module.css";
 import { useEffect, useState } from "react";
-
 
 export function TasksPage() {
   const [tasks, setTasks] = useState([]);
@@ -31,6 +29,27 @@ export function TasksPage() {
     fetchTasks();
   }, []);
 
+  const handleSubmit = async (taskId) => {
+     try {
+        const response = await fetch(
+          "http://localhost:8000/agent/view-tasks"
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch tasks");
+        }
+
+        const data = await response.json();
+        setTasks(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+
+    console.log("Submit clicked for task:", taskId);
+  };
+
   if (loading)
     return (
       <div className={styles.centerMessage}>
@@ -55,46 +74,56 @@ export function TasksPage() {
         <div className={styles.tasksGrid}>
           {tasks.map((task) => (
             <div key={task.task_id} className={styles.card}>
-              <h3 className={styles.title}>
-                {task.task_description}
-              </h3>
+              
+              {/* Content Wrapper */}
+              <div>
+                <h3 className={styles.title}>
+                  {task.task_description}
+                </h3>
 
-              <p className={styles.meta}>
-                <strong>Project ID:</strong> {task.project_id}
-              </p>
+                <p className={styles.meta}>
+                  <strong>Project ID:</strong> {task.project_id}
+                </p>
 
-              <p className={styles.meta}>
-                <strong>Status:</strong> {task.status}
-              </p>
+                <p className={styles.meta}>
+                  <strong>Status:</strong> {task.status}
+                </p>
 
-              <p className={styles.meta}>
-                <strong>Repo:</strong>{" "}
-                <a
-                  href={task.github_repo}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.repoLink}
-                >
-                  {task.github_repo}
-                </a>
-              </p>
+                <p className={styles.meta}>
+                  <strong>Repo:</strong>{" "}
+                  <a
+                    href={task.github_repo}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.repoLink}
+                  >
+                    {task.github_repo}
+                  </a>
+                </p>
 
-              <div className={styles.skillsSection}>
-                <div className={styles.skillsTitle}>
-                  MATCHED SKILLS
-                </div>
+                <div className={styles.skillsSection}>
+                  <div className={styles.skillsTitle}>
+                    MATCHED SKILLS
+                  </div>
 
-                <div className={styles.skillPills}>
-                  {task.matched_skills.map((skill, i) => (
-                    <span
-                      key={i}
-                      className={styles.skillPill}
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                  <div className={styles.skillPills}>
+                    {task.matched_skills.map((skill, i) => (
+                      <span key={i} className={styles.skillPill}>
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
+
+              {/* Submit Button */}
+              <button
+                className={styles.submitButton}
+                onClick={() => handleSubmit(task.task_id)}
+              >
+                Submit
+              </button>
+
             </div>
           ))}
         </div>
