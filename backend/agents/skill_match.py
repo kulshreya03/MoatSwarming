@@ -20,6 +20,7 @@ def get_db():
 
 def match_skills_to_tasks(db:Session):
     tasks = db.query(models.ProjectTasks).all()
+    #print(tasks)
 
     # Convert tasks to list
     task_list = []
@@ -31,8 +32,10 @@ def match_skills_to_tasks(db:Session):
             "github_repo": task.github_repo,
             "status": task.status
         })
+    #print(task_list)
 
     resume_skills = state["resume_skills"]
+    #print(resume_skills)
     if not resume_skills:
         return []
 
@@ -40,12 +43,13 @@ def match_skills_to_tasks(db:Session):
     flat_skills = []
     for category in resume_skills.values():
         flat_skills.extend(category)
+    #print(flat_skills)
 
     prompt = f"""
 You are an expert skill-task matching agent.
 
 GOAL:
-Match resume skills with project tasks and return ONLY relevant tasks.
+Match resume skills with project tasks and Return ONLY relevant tasks.
 
 MATCHING RULES:
 
@@ -66,6 +70,26 @@ MATCHING RULES:
    map it to related skills.
 
 4. Return task if ≥1 skill matches.
+
+EXAMPLE:
+
+Resume Skills:
+["Python", "FastAPI", "JWT"]
+
+Task:
+"Backend API Module (FastAPI) - REST endpoints"
+
+Output:
+[
+  {{
+    "task_id": 1,
+    "project_id": 1,
+    "task_description": "Backend API Module (FastAPI) - REST endpoints",
+    "github_repo": "...",
+    "status": "pending",
+    "matched_skills": ["FastAPI", "Python"]
+  }}
+]
 
 Resume Skills:
 {flat_skills}

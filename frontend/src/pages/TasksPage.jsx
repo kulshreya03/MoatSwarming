@@ -8,7 +8,7 @@ export function TasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("http://localhost:8000/view-tasks");
+        const response = await fetch("http://localhost:8000/agent/view-tasks");
 
         if (!response.ok) {
           throw new Error("Failed to fetch tasks");

@@ -100,6 +100,7 @@ Return EXACT JSON STRUCTURE:
     try:
         data = json.loads(content)
         state["resume_skills"] = data["skills"]
+        print(state["resume_skills"])
         return data["skills"]
     except json.JSONDecodeError:
         raise ValueError("Failed to parse JSON from LLM response")
