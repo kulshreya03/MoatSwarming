@@ -30,17 +30,25 @@ export function TasksPage() {
   }, []);
 
   const handleSubmit = async (taskId) => {
+
+    setLoading(true);
      try {
         const response = await fetch(
-          "http://localhost:8000/agent/view-tasks"
+          "http://localhost:8000/tasks/update-status?task_id=${taskId}",
+          {
+            method: "POST",
+          }
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch tasks");
+          const errData = await response.json();
+          throw new Error(errData.detail || "Failed to update");
         }
 
         const data = await response.json();
-        setTasks(data);
+        console.log("Task status updated:", data);
+        //await fetchTasks();
+
       } catch (err) {
         setError(err.message);
       } finally {

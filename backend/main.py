@@ -1,3 +1,5 @@
+from routes import tasks_routes
+from routes import database_auth_routes, agent_routes
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,6 +18,6 @@ async def read_root():
 async def health_check():
     return {"status": "healthy"}
 
-from routes import database_auth_routes, agent_routes
 app.include_router(database_auth_routes.router)
 app.include_router(agent_routes.router)
+app.include_router(tasks_routes.router)
