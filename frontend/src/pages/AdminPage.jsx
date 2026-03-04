@@ -44,12 +44,32 @@ export function AdminPage() {
       <div className={styles.card}>
         <div className={styles.title}>Admin Dashboard</div>
 
-        {loading && <p>Loading...</p>}
-        {error && <p>{error}</p>}
+        {loading && <p className={styles.loading}>Loading...</p>}
+        {error && <p className={styles.error}>{error}</p>}
 
-        {tasks.map((task, index) => (
-          <div key={index}>{task.name}</div>
-        ))}
+        {tasks.length === 0 && !loading && (
+  <p>No assigned tasks found.</p>
+)}
+
+{tasks.map((task) => (
+  <div key={task.task_id} className={styles.taskCard}>
+    <div className={styles.taskHeader}>
+      <span className={styles.taskId}>Task #{task.task_id}</span>
+      <span className={styles.status}>{task.status}</span>
+    </div>
+
+    <p>{task.task_description}</p>
+
+    <a
+      href={task.github_repo}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View Repository
+    </a>
+    </div>
+  ))}
+
       </div>
     </div>
   );
