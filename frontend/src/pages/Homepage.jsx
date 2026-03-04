@@ -4,14 +4,20 @@ export function Homepage()
 {
     const navigate=useNavigate()
 
-    function handleClick()
+    function redirectStudent()
     {
         navigate("/UserLogin")
     }
 
+    function redirectAdmin()
+    {
+        navigate("/AdminLogin")
+    }
+
     return(
         <div>
-            <button onClick={handleClick}>Student Login</button>                
+            <button onClick={redirectStudent}>Student Login</button> 
+            <button onClick={redirectAdmin}>Admin Login </button>               
         </div>
     )
 }
