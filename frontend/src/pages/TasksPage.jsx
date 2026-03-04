@@ -34,7 +34,7 @@ export function TasksPage() {
     setLoading(true);
      try {
         const response = await fetch(
-          "http://localhost:8000/tasks/update-status?task_id=${taskId}",
+          `http://localhost:8000/tasks/update-status?task_id=${taskId}`,
           {
             method: "POST",
           }
@@ -47,7 +47,7 @@ export function TasksPage() {
 
         const data = await response.json();
         console.log("Task status updated:", data);
-        //await fetchTasks();
+        await fetchTasks();
 
       } catch (err) {
         setError(err.message);

@@ -36,7 +36,7 @@ def match_skills_to_tasks(db:Session):
             })    
 
 
-    #print(task_list)
+    print(task_list)
 
     resume_skills = state["resume_skills"]
     #print(resume_skills)
@@ -49,51 +49,115 @@ def match_skills_to_tasks(db:Session):
         flat_skills.extend(category)
     #print(flat_skills)
 
-    prompt = f"""
-You are an expert skill-task matching agent.
+    prompt = fprompt = f"""
+You are an expert Skill-Task Matching Agent.
 
-GOAL:
-Match resume skills with project tasks and Return ONLY relevant tasks.
+OBJECTIVE:
+Match resume skills with project tasks and return ONLY relevant tasks.
 
-MATCHING RULES:
+You must behave like a deterministic matching engine, not a chatbot.
+
+--------------------------------------------------
+MATCHING PIPELINE (Follow STRICTLY)
+--------------------------------------------------
+
+Step 1 — Normalize Resume Skills
+- Convert all skills to lowercase
+- Expand abbreviations
+- Merge duplicates
+
+Example:
+"Node", "NodeJS" → "node.js"
+
+--------------------------------------------------
+
+Step 2 — Expand Skills Semantically
+
+Use the mapping below:
+
+FRONTEND →
+react, angular, vue, html, css, javascript, typescript, next.js
+
+BACKEND →
+node.js, express, python, fastapi, django, java, spring, .net
+
+DATABASE →
+mongodb, mysql, postgresql, redis, firebase
+
+CLOUD →
+aws, azure, gcp, vercel, netlify
+
+DEVOPS →
+docker, kubernetes, ci/cd, github actions, jenkins, terraform
+
+AUTHENTICATION →
+jwt, oauth, session auth, web3 auth
+
+BLOCKCHAIN →
+ethereum, solidity, web3, metamask, smart contracts
+
+--------------------------------------------------
+
+Step 3 — Task Skill Extraction
+
+From each task description:
+
+Extract:
+
+• Tech stack names  
+• Frameworks  
+• Domain words (frontend, backend, cloud, devops, database)
+
+Example:
+
+"Build Frontend Dashboard using React"
+
+Extract →
+frontend, react
+
+--------------------------------------------------
+
+Step 4 — Matching Logic
+
+A task is MATCHED if ANY of these are true:
 
 1. Direct keyword match  
-   Example:
-   - React → React task
-   - Node.js → Backend API task
+2. Semantic category match  
+3. Synonym match  
+4. Domain match
 
-2. Fuzzy semantic mapping:
+Examples:
 
-   FRONTEND → React, Angular, Vue, HTML, CSS, JavaScript  
-   BACKEND → Node.js, Python, Java, Express.js, Spring  
-   DATABASE → MongoDB, MySQL, PostgreSQL  
-   CLOUD → AWS, Azure, GCP  
-   DEVOPS → Docker, Kubernetes, CI/CD, Jenkins  
+Resume: AWS  
+Task: Deploy backend to cloud → MATCH
 
-3. If task mentions a domain (e.g., "frontend dashboard"),
-   map it to related skills.
+Resume: React  
+Task: Frontend dashboard → MATCH
 
-4. Return task if ≥1 skill matches.
+Resume: Docker  
+Task: CI/CD pipeline → MATCH
 
-EXAMPLE:
+--------------------------------------------------
 
-Resume Skills:
-["Python", "FastAPI", "JWT"]
+Step 5 — Matched Skills Output
 
-Task:
-"Backend API Module (FastAPI) - REST endpoints"
+Return ONLY skills that contributed to the match.
 
-Output:
-[
-  {{
-    "task_id": 1,
-    "project_id": 1,
-    "task_description": "Backend API Module (FastAPI) - REST endpoints",
-    "github_repo": "...",
-    "status": "pending",
-    "matched_skills": ["FastAPI", "Python"]
-  }}
-]
+Example:
+
+matched_skills: ["React", "JavaScript"]
+
+--------------------------------------------------
+
+FILTERING RULE
+
+• If NO skills match → DO NOT return task  
+• If ≥1 skill matches → RETURN task  
+
+--------------------------------------------------
+
+INPUT DATA
+--------------------------------------------------
 
 Resume Skills:
 {flat_skills}
@@ -101,7 +165,11 @@ Resume Skills:
 Project Tasks:
 {json.dumps(task_list, indent=2)}
 
-STRICT OUTPUT JSON:
+--------------------------------------------------
+
+STRICT OUTPUT FORMAT (JSON ONLY)
+--------------------------------------------------
+
 [
   {{
     "task_id": int,
@@ -112,6 +180,14 @@ STRICT OUTPUT JSON:
     "matched_skills": [string]
   }}
 ]
+
+IMPORTANT:
+
+• Do NOT explain  
+• Do NOT add text  
+• Do NOT hallucinate skills  
+• Do NOT return unmatched tasks  
+• Output MUST be valid JSON
 """
 
     response = llm.invoke([HumanMessage(content=prompt)])

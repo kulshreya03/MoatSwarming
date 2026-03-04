@@ -13,6 +13,14 @@ from agents.skill_match import match_skills_to_tasks
 
 router = APIRouter(prefix="/agent", tags=["Agent Management"])
 
+#Coonect to DB
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 # Pydantic model for task response
 class TaskResponse(BaseModel):
     task_id: int
@@ -24,6 +32,13 @@ class TaskResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class OngoingTaskResponse(BaseModel):
+    task_id: int
+    project_id: int
+    task_description: str
+    github_repo: str
+    status: str
 
 
 @router.post("/extract-skills")
@@ -39,7 +54,7 @@ async def extract_skills(resume:UploadFile = File(...)):
     state["resume_text"] = skills
     return {"skills": skills}
 
-@router.get("/view-tasks", response_model=List[TaskResponse])
+@router.get("/view-tasks")
 async def view_tasks():
     """Fetch all tasks from the database"""
     db = SessionLocal()
@@ -50,4 +65,16 @@ async def view_tasks():
         return tasks
     finally:
         db.close()
+
+
+#Admin Route
+@router.get("/view-ongoing-tasks", response_model=List[OngoingTaskResponse])
+async def view_ongoing_tasks(db: Session = Depends(get_db)):
+
+    db = SessionLocal()
+    tasks = db.query(models.ProjectTasks)\
+        .filter(models.ProjectTasks.status == 'assigned')\
+        .all()
+
+    return tasks
 

@@ -11,7 +11,7 @@ export function AdminPage() {
     const fetchTasks = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/agent/view-tasks"
+          "http://localhost:8000/agent/view-ongoing-tasks"
         );
 
         if (!response.ok) {
