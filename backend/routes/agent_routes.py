@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 from state import state
 from agents.skill_match import match_skills_to_tasks
 
+from services.github_mcp_service import get_commit_count
+
 
 router = APIRouter(prefix="/agent", tags=["Agent Management"])
 
@@ -38,6 +40,7 @@ class OngoingTaskResponse(BaseModel):
     project_id: int
     task_description: str
     github_repo: str
+    commit_count: int
     status: str
 
 
@@ -71,10 +74,26 @@ async def view_tasks():
 @router.get("/view-ongoing-tasks", response_model=List[OngoingTaskResponse])
 async def view_ongoing_tasks(db: Session = Depends(get_db)):
 
-    db = SessionLocal()
     tasks = db.query(models.ProjectTasks)\
         .filter(models.ProjectTasks.status == 'assigned')\
         .all()
+    
+    response = []
 
-    return tasks
+    for task in tasks:
+
+        commit_count = await get_commit_count(task.github_repo)
+        print(commit_count)
+
+        response.append({
+            "task_id": task.task_id,
+            "project_id": task.project_id,
+            "task_description": task.task_description,
+            "github_repo": task.github_repo,
+            "commit_count": commit_count,
+            "status":task.status
+        })  
+
+
+    return response
 
