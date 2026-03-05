@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from state import state
 from langchain_core.messages import HumanMessage
 import json
+import re
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -36,7 +37,7 @@ def match_skills_to_tasks(db:Session):
             })    
 
 
-    print(task_list)
+    print("Task List:", task_list)
 
     resume_skills = state["resume_skills"]
     #print(resume_skills)
@@ -44,131 +45,63 @@ def match_skills_to_tasks(db:Session):
         return []
 
     # Flatten categorized skills → single list
-    flat_skills = []
-    for category in resume_skills.values():
-        flat_skills.extend(category)
-    #print(flat_skills)
+    flat_skills = state["flat_skills"]
+    print("Resume skills:", flat_skills)
 
-    prompt = fprompt = f"""
-You are an expert Skill-Task Matching Agent.
 
-OBJECTIVE:
-Match resume skills with project tasks and return ONLY relevant tasks.
+    #New Additions
+    skill_lookup = state["skill_lookup"]
 
-You must behave like a deterministic matching engine, not a chatbot.
+    filtered_tasks = []
 
---------------------------------------------------
-MATCHING PIPELINE (Follow STRICTLY)
---------------------------------------------------
+    for task in task_list:
+        text = task["task_description"].lower()
 
-Step 1 — Normalize Resume Skills
-- Convert all skills to lowercase
-- Expand abbreviations
-- Merge duplicates
+        tokens = re.findall(r"[a-zA-Z0-9\.\-]+", text)
 
-Example:
-"Node", "NodeJS" → "node.js"
+        if any(skill in tokens for skill in skill_lookup):
+            filtered_tasks.append(task)
 
---------------------------------------------------
+    # if nothing matched, fallback to all tasks
+    if not filtered_tasks:
+        filtered_tasks = task_list
 
-Step 2 — Expand Skills Semantically
+    prompt = f"""
+You are a Skill-Task Matching Engine.
 
-Use the mapping below:
+Match resume skills with project tasks.
 
-FRONTEND →
-react, angular, vue, html, css, javascript, typescript, next.js
+Return ONLY tasks that match the resume skills.
 
-BACKEND →
-node.js, express, python, fastapi, django, java, spring, .net
-
-DATABASE →
-mongodb, mysql, postgresql, redis, firebase
-
-CLOUD →
-aws, azure, gcp, vercel, netlify
-
-DEVOPS →
-docker, kubernetes, ci/cd, github actions, jenkins, terraform
-
-AUTHENTICATION →
-jwt, oauth, session auth, web3 auth
-
-BLOCKCHAIN →
-ethereum, solidity, web3, metamask, smart contracts
-
---------------------------------------------------
-
-Step 3 — Task Skill Extraction
-
-From each task description:
-
-Extract:
-
-• Tech stack names  
-• Frameworks  
-• Domain words (frontend, backend, cloud, devops, database)
-
-Example:
-
-"Build Frontend Dashboard using React"
-
-Extract →
-frontend, react
-
---------------------------------------------------
-
-Step 4 — Matching Logic
-
-A task is MATCHED if ANY of these are true:
-
-1. Direct keyword match  
-2. Semantic category match  
-3. Synonym match  
-4. Domain match
-
-Examples:
-
-Resume: AWS  
-Task: Deploy backend to cloud → MATCH
-
-Resume: React  
-Task: Frontend dashboard → MATCH
-
-Resume: Docker  
-Task: CI/CD pipeline → MATCH
-
---------------------------------------------------
-
-Step 5 — Matched Skills Output
-
-Return ONLY skills that contributed to the match.
-
-Example:
-
-matched_skills: ["React", "JavaScript"]
-
---------------------------------------------------
-
-FILTERING RULE
-
-• If NO skills match → DO NOT return task  
-• If ≥1 skill matches → RETURN task  
-
---------------------------------------------------
-
-INPUT DATA
---------------------------------------------------
-
-Resume Skills:
+------------------------
+RESUME SKILLS
+------------------------
 {flat_skills}
 
-Project Tasks:
-{json.dumps(task_list, indent=2)}
+------------------------
+PROJECT TASKS
+------------------------
+{json.dumps(filtered_tasks, indent=2)}
 
---------------------------------------------------
+------------------------
+MATCHING RULES
+------------------------
 
-STRICT OUTPUT FORMAT (JSON ONLY)
---------------------------------------------------
+A task matches if:
+
+1. A resume skill appears in the task description
+2. A framework matches its language
+   example: react → frontend
+3. A cloud skill matches cloud tasks
+   example: aws → deployment
+4. A database skill matches database tasks
+5. DevOps skills match CI/CD or deployment tasks
+
+------------------------
+OUTPUT FORMAT
+------------------------
+
+Return ONLY JSON.
 
 [
   {{
@@ -181,18 +114,15 @@ STRICT OUTPUT FORMAT (JSON ONLY)
   }}
 ]
 
-IMPORTANT:
-
-• Do NOT explain  
-• Do NOT add text  
-• Do NOT hallucinate skills  
-• Do NOT return unmatched tasks  
-• Output MUST be valid JSON
+Do NOT return tasks with no matching skills.
 """
+
 
     response = llm.invoke([HumanMessage(content=prompt)])
     try:
-        matched_tasks = json.loads(response.content)
+        content = re.sub(r"```json|```", "", response.content).strip()
+        matched_tasks = json.loads(content)
+        print(response.content)
     except Exception:
         matched_tasks = []
 

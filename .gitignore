@@ -125,3 +125,4 @@ coverage/
 .next/
 out/
 
+example_output.txt

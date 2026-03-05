@@ -4,49 +4,67 @@ import re
 from langchain_core.messages import HumanMessage
 from state import state
 
-def extract_skills_from_text(resume_text: str) -> list[str]:
+
+def normalize_skill(skill: str) -> str:
+    """Normalize skill names for matching"""
+    
+    skill = skill.lower().strip()
+
+    synonym_map = {
+        "node": "node.js",
+        "nodejs": "node.js",
+        "express": "express.js",
+        "mongo": "mongodb",
+        "aws ec2": "aws",
+        "js": "javascript",
+        "reactjs": "react",
+        "postgres": "postgresql"
+    }
+
+    return synonym_map.get(skill, skill)
+
+
+def python_skill_matcher(skills_dict):
+    """
+    Fast Python skill processing layer before LLM matching
+    """
+
+    flat_skills = []
+
+    for category in skills_dict.values():
+        for skill in category:
+            normalized = normalize_skill(skill)
+            flat_skills.append(normalized)
+
+    # remove duplicates
+    flat_skills = list(set(flat_skills))
+
+    # create lookup set (fast matching)
+    skill_set = set(flat_skills)
+
+    return flat_skills, skill_set
+
+
+def extract_skills_from_text(resume_text: str):
 
     prompt = f"""
-    You are an expert resume parsing and skill extraction AI.
+You are an expert resume parsing and skill extraction AI.
 
 STRICT OUTPUT RULES:
 
 * Return ONLY valid raw JSON
 * No markdown
-* No explanations or text outside JSON
-* Do not include trailing commas
-* All fields must exist even if empty
-* Skill names must be concise, normalized, and deduplicated
-* Use commonly accepted industry names (e.g., "Node.js" not "Node", "PostgreSQL" not "Postgres" unless context demands)
+* No explanations
+* No trailing commas
+* All fields must exist
+* Skills must be normalized and deduplicated
 * Do NOT include soft skills
-* Do NOT include job roles as skills
-
-EXTRACTION RULES:
-
-* Extract ONLY technical skills
-* Infer skills even if mentioned in projects/tools context
-* Map synonyms → normalized name
-  Example:
-  "Express" → "Express.js"
-  "Mongo" → "MongoDB"
-  "AWS EC2" → "AWS"
-
-DOMAIN INFERENCE RULES:
-
-* Domain must be specific and professional
-* Examples:
-
-  * "Full Stack Web Development"
-  * "Cloud & DevOps Engineering"
-  * "Backend Engineering"
-  * "Blockchain Development"
-  * "Data Engineering"
-* Choose the MOST dominant domain based on skills + projects
 
 Resume Text:
 {resume_text}
 
-Return EXACT JSON STRUCTURE:
+Return EXACT JSON:
+
 {{
 "skills": {{
 "languages": [],
@@ -62,46 +80,27 @@ Return EXACT JSON STRUCTURE:
 }}
 """
 
-    '''prompt = f"""
-    You are an expert resume parsing AI.
-
-    STRICT RULES:
-    - Return ONLY valid raw JSON
-    - No markdown
-    - No explanations
-    - All fields must exist
-    - Skill names must be concise and normalized
-
-    Extract:
-    1. Categorized technical skills
-    2. Primary professional domain (specific role/domain)
-
-    Resume Text:
-    {resume_text}
-
-    Return EXACT JSON:
-    {{
-    "skills": {{
-        "languages": [],
-        "frameworks": [],
-        "databases": [],
-        "cloud": [],
-        "tools": [],
-        "concepts": []
-    }},
-    "domain": ""
-    }}
-    """
-
-    '''
-
     response = llm.invoke([HumanMessage(content=prompt)])
+
     content = re.sub(r"```json|```", "", response.content).strip()
+
     try:
         data = json.loads(content)
-        state["resume_skills"] = data["skills"]
-        print(state["resume_skills"])
-        return data["skills"]
+
+        skills_dict = data["skills"]
+
+        # ---------- Python Skill Matcher Layer ----------
+        flat_skills, skill_set = python_skill_matcher(skills_dict)
+
+        # store in state
+        state["resume_skills"] = skills_dict
+        state["flat_skills"] = flat_skills
+        state["skill_lookup"] = skill_set
+
+        print("Categorized Skills:", skills_dict)
+        print("Flat Skills:", flat_skills)
+
+        return skills_dict
+
     except json.JSONDecodeError:
         raise ValueError("Failed to parse JSON from LLM response")
-    

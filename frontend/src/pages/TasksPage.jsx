@@ -6,7 +6,7 @@ export function TasksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  
     const fetchTasks = async () => {
       try {
         const response = await fetch(
@@ -25,6 +25,8 @@ export function TasksPage() {
         setLoading(false);
       }
     };
+
+    useEffect(() => {
 
     fetchTasks();
   }, []);
