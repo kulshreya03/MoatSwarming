@@ -60,6 +60,14 @@ export function AdminPage() {
 
     <p>{task.task_description}</p>
 
+    <div className={styles.commitSection}>
+      <span className={styles.commitLabel}>Commits:</span>
+      <span className={`${styles.commitCount} ${
+        task.commit_count === 0 ? styles.noCommits : ""
+        }`}
+      >{task.commit_count}</span>
+    </div>
+
     <a
       href={task.github_repo}
       target="_blank"
