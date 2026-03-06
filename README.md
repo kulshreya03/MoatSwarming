@@ -1,15 +1,34 @@
 # Moat Swarming
 
-A full-stack application with a FastAPI backend and React frontend, designed for collaborative swarming and moat-based operations.
+**The Moat Swarming Framework is an open, collaborative software platform designed to empower individuals—particularly the unemployed and underemployed—to collectively analyze, deconstruct, and replicate the business models of dominant market incumbents.** The framework provides a secure, modular environment where users can form teams, conduct open-source intelligence gathering, reverse engineer products and services, and co-create parallel ventures. Core features include a moat analysis engine, project management tools, skill-matching algorithms, knowledge repositories, and integrated legal/ethical compliance modules. The platform emphasizes transparency, ethical collaboration, and sustainable business creation, offering built-in mechanisms for profit-sharing, community governance, and ongoing mentorship. By democratizing access to business innovation and lowering barriers to entrepreneurship, the Moat Swarming Framework aims to redistribute opportunity, foster economic inclusion, and challenge entrenched monopolies through collective action.
 
 ## Project Structure
 
 ```
 MoatSwarming/
-├── backend/                 # FastAPI backend service
+├── backend/                 # FastAPI backend service and agents logic
 │   ├── main.py             # FastAPI application entry point
-│   ├── requirements.txt     # Python dependencies
-│   └── __pycache__/        # Python cache directory
+│   ├── requirements.txt    # Python dependencies
+│   ├── state.py            # Application state and configurations
+│   ├── graph.py            # Graph utilities for moat/swarm logic
+│   ├── llm.py              # Language model integration helpers
+│   ├── database/           # Database layer
+│   │   ├── database.py     # Connection and session management
+│   │   ├── models.py       # ORM models
+│   │   └── db_schema.txt   # Schema description
+│   ├── routes/             # API route definitions
+│   │   ├── agent_routes.py
+│   │   ├── database_auth_routes.py
+│   │   └── tasks_routes.py
+│   ├── services/           # External service integrations
+│   │   └── github_mcp_service.py
+│   ├── agents/             # Agent skills and behavior modules
+│   │   ├── skill_extract.py
+│   │   ├── skill_match.py
+│   │   └── task_decompose.py
+│   ├── alembic.ini         # DB migration config
+│   ├── alembic/            # Migration scripts
+│   └── __pycache__/
 ├── frontend/               # React frontend application
 │   ├── src/               # Source files
 │   │   ├── App.jsx        # Main React component
@@ -26,17 +45,35 @@ MoatSwarming/
 └── requirements.txt       # Root-level Python dependencies (empty)
 ```
 
+The backend has evolved beyond a simple "main.py"; it now includes state management, agent skills, database models, and routing modules. The frontend continues to use React with Vite and includes dedicated CSS modules for pages like admin and user flows.
+
+
 ## Technology Stack
 
 ### Backend
 - **FastAPI** - Modern Python web framework
 - **Uvicorn** - ASGI server for running FastAPI
-- **SQLAlchemy** - SQL toolkit and ORM
+- **SQLAlchemy** - Database toolkit and ORM
+- **GitHub MCP service** - Integration for agent coordination and commit analytics
 
 ### Frontend
 - **React** (v19.2.0) - UI library
 - **Vite** (v7.2.4) - Build tool and dev server
 - **ESLint** (v9.39.1) - Code linting
+
+
+## Features & Highlights
+
+- **Agent Skill Processing** – Upload resumes for PDF skill extraction (`/agent/extract-skills`) and match candidates to tasks based on a skill matrix.
+- **Task Discovery** – View available tasks and ongoing assignments including GitHub commit counts to monitor progress (`/agent/view-tasks`, `/agent/view-ongoing-tasks`).
+- **Authentication** – Secure login endpoint for users (`/auth/login`) with database validation.
+- **Task Management** – Endpoints to update task status and manage assignments (`/tasks/update-status`).
+- **Modular Backend** – State management, graph utilities, and LLM integration in separate modules.
+- **Database Layer** – SQLAlchemy models with Alembic migrations and a documented schema in `database/db_schema.txt`.
+- **Frontend Structure** – React pages organized with CSS modules for admin/user workflows; real-time data fetched from backend APIs.
+- **CORS Enabled** – Backend configured to allow cross-origin access; adjust for production.
+
+The architecture supports evolution toward a comprehensive moat analysis and collaborative project management platform.
 
 ## Prerequisites
 
@@ -82,8 +119,13 @@ MoatSwarming/
    The backend will be available at `http://localhost:8000`
    
    **API Endpoints:**
-   - `GET /` - Welcome message
-   - `GET /health` - Health check
+   - `GET /` – Welcome message
+   - `GET /health` – Health check
+   - `POST /auth/login` – Authenticate user with email/password
+   - `POST /agent/extract-skills` – Upload a resume (PDF) and extract skills via agent
+   - `GET /agent/view-tasks` – Retrieve tasks matched to current skills
+   - `GET /agent/view-ongoing-tasks` – Admin view of assigned tasks with GitHub commit counts
+   - `POST /tasks/update-status?task_id=<id>` – Mark a task as assigned
    - API documentation available at `http://localhost:8000/docs` (Swagger UI)
 
 ### Frontend Setup
