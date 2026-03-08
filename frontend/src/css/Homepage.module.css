@@ -1,0 +1,138 @@
+.page{
+  width:100%;
+  min-height:100vh;
+  background: linear-gradient(135deg,#020617,#0f172a);
+  color:white;
+  font-family: system-ui, sans-serif;
+}
+
+/* HERO */
+
+.hero{
+  padding:120px 10%;
+  text-align:center;
+}
+
+.title{
+  font-size:64px;
+  font-weight:700;
+  margin-bottom:20px;
+}
+
+.subtitle{
+  max-width:900px;
+  margin:auto;
+  font-size:20px;
+  line-height:1.6;
+  opacity:0.9;
+}
+
+.ctaRow{
+  margin-top:40px;
+  display:flex;
+  justify-content:center;
+  gap:20px;
+}
+
+.primaryBtn{
+  padding:14px 28px;
+  border:none;
+  border-radius:10px;
+  background:#6366f1;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.primaryBtn:hover{
+  transform:translateY(-2px);
+}
+
+.secondaryBtn{
+  padding:14px 28px;
+  border-radius:10px;
+  border:1px solid #6366f1;
+  background:transparent;
+  color:white;
+  cursor:pointer;
+}
+
+/* SECTIONS */
+
+.section{
+  padding:90px 10%;
+}
+
+.sectionAlt{
+  padding:90px 10%;
+  background:rgba(255,255,255,0.03);
+}
+
+.section h2,
+.sectionAlt h2{
+  font-size:36px;
+  margin-bottom:30px;
+}
+
+.section p{
+  max-width:900px;
+  line-height:1.7;
+  margin-bottom:18px;
+}
+
+/* GRID */
+
+.grid3{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+  margin-top:30px;
+}
+
+.card{
+  padding:25px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+}
+
+/* WORKFLOW */
+
+.workflow{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap:30px;
+  margin-top:40px;
+}
+
+.step{
+  background:rgba(255,255,255,0.05);
+  padding:25px;
+  border-radius:14px;
+}
+
+.stepNumber{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:#6366f1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:12px;
+}
+
+
+/* FOOTER */
+
+.footer{
+  padding:80px 10%;
+  text-align:center;
+  background:#020617;
+}
