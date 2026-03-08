@@ -155,6 +155,17 @@
     0 6px 18px rgba(37, 99, 235, 0.4);
 }
 
+.submittedButton {
+  background: linear-gradient(
+    135deg,
+    #16a34a,
+    #15803d
+  );
+
+  box-shadow:
+    0 10px 25px rgba(22, 163, 74, 0.45);
+}
+
 /* Empty State */
 .empty {
   opacity: 0.7;
@@ -168,8 +179,55 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 
   background: radial-gradient(circle at top, #0f172a, #020617);
   color: white;
   font-size: 20px;
+}
+
+/* Loader */
+
+.loader {
+  position: relative;
+  font-size: 16px;
+  width: 5.5em;
+  height: 5.5em;
+}
+
+.loader:before {
+  content: '';
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(45deg);
+  height: 100%;
+  width: 4px;
+  background: #fff;
+  left: 50%;
+  top: 50%;
+}
+
+.loader:after {
+  content: '';
+  position: absolute;
+  left: 0.2em;
+  bottom: 0.18em;
+  width: 1em;
+  height: 1em;
+  background-color: orange;
+  border-radius: 15%;
+  animation: rollingRock 2.5s cubic-bezier(.79, 0, .47, .97) infinite;
+}
+
+@keyframes rollingRock {
+  0% { transform: translate(0, -1em) rotate(-45deg) }
+  5% { transform: translate(0, -1em) rotate(-50deg) }
+  20% { transform: translate(1em, -2em) rotate(47deg) }
+  25% { transform: translate(1em, -2em) rotate(45deg) }
+  30% { transform: translate(1em, -2em) rotate(40deg) }
+  45% { transform: translate(2em, -3em) rotate(137deg) }
+  50% { transform: translate(2em, -3em) rotate(135deg) }
+  55% { transform: translate(2em, -3em) rotate(130deg) }
+  70% { transform: translate(3em, -4em) rotate(217deg) }
+  75% { transform: translate(3em, -4em) rotate(220deg) }
+  100% { transform: translate(0, -1em) rotate(-225deg) }
 }

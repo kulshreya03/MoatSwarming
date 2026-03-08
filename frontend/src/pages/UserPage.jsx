@@ -68,7 +68,7 @@ export function UserPage() {
         <button
         type="button"
         onClick={() => {
-          navigate('/TasksPage')
+          window.open('/TasksPage', '_blank').focus();
         }}
         className={styles.secondaryButton}
         >

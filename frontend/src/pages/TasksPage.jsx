@@ -5,6 +5,7 @@ export function TasksPage() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [submittingTasks, setSubmittingTasks] = useState(new Set());
 
   
     const fetchTasks = async () => {
@@ -33,39 +34,52 @@ export function TasksPage() {
 
   const handleSubmit = async (taskId) => {
 
-    setLoading(true);
-     try {
-        const response = await fetch(
-          `http://localhost:8000/tasks/update-status?task_id=${taskId}`,
-          {
-            method: "POST",
-          }
-        );
+    // mark this task as submitting
+    setSubmittingTasks(prev => new Set(prev).add(taskId));
 
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.detail || "Failed to update");
-        }
+    try {
+      const response = await fetch(
+        `http://localhost:8000/tasks/update-status?task_id=${taskId}`,
+        { method: "POST" }
+      );
 
-        const data = await response.json();
-        console.log("Task status updated:", data);
-        await fetchTasks();
-
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || "Failed to update");
       }
 
-    console.log("Submit clicked for task:", taskId);
+      const data = await response.json();
+      console.log("Task status updated:", data);
+
+      // update task status locally
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.task_id === taskId
+            ? { ...task, status: "Submitted" }
+            : task
+        )
+      );
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+
+      // remove submitting state
+      setSubmittingTasks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(taskId);
+        return newSet;
+      });
+
+    }
   };
 
   if (loading)
-    return (
-      <div className={styles.centerMessage}>
-        Loading tasks...
-      </div>
-    );
+  return (
+    <div className={styles.centerMessage}>Loading Tasks... 
+      <div className={styles.loader}></div>
+    </div>
+  );
 
   if (error)
     return (
@@ -128,10 +142,19 @@ export function TasksPage() {
 
               {/* Submit Button */}
               <button
-                className={styles.submitButton}
+                className={`${styles.submitButton} ${
+                  task.status === "Submitted" ? styles.submittedButton : ""
+                }`}
                 onClick={() => handleSubmit(task.task_id)}
+                disabled={
+                  submittingTasks.has(task.task_id) || task.status === "Submitted"
+                }
               >
-                Submit
+                {submittingTasks.has(task.task_id)
+                  ? "Submitting..."
+                  : task.status === "Submitted"
+                  ? "Submitted ✓"
+                  : "Submit"}
               </button>
 
             </div>
