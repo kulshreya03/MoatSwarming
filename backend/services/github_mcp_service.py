@@ -35,7 +35,70 @@ def parse_repo(repo_full: str):
 
     return None, None
 
+async def get_commit_counts(repo_list: list[str]):
 
+    commit_map = {}
+
+    server_params = StdioServerParameters(
+        command=GITHUB_MCP_PATH,
+        args=["stdio"],
+        env={
+            **os.environ,
+            "GITHUB_PERSONAL_ACCESS_TOKEN": GITHUB_PAT,
+        },
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+
+            await session.initialize()
+
+            for repo_full in repo_list:
+
+                owner, repo = parse_repo(repo_full)
+
+                if not owner or not repo:
+                    commit_map[repo_full] = 0
+                    continue
+
+                try:
+
+                    result = await session.call_tool(
+                        "list_commits",
+                        {
+                            "owner": owner,
+                            "repo": repo,
+                            "sha": "main"
+                        }
+                    )
+
+                    if hasattr(result, "content"):
+
+                        text = "\n".join(
+                            getattr(c, "text", str(c))
+                            for c in result.content
+                        )
+
+                        data = json.loads(text)
+
+                        if isinstance(data, list):
+                            commit_map[repo_full] = len(data)
+
+                        elif isinstance(data, dict) and "commits" in data:
+                            commit_map[repo_full] = len(data["commits"])
+
+                        else:
+                            commit_map[repo_full] = 0
+
+                    else:
+                        commit_map[repo_full] = 0
+
+                except Exception:
+                    commit_map[repo_full] = 0
+
+    return commit_map
+
+'''
 async def get_commit_count(repo_full: str):
 
     owner, repo = parse_repo(repo_full)
@@ -87,4 +150,4 @@ async def get_commit_count(repo_full: str):
                     return 0
 
     return 0
-
+'''

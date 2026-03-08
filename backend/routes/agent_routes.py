@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from state import state
 from agents.skill_match import match_skills_to_tasks
 
-from services.github_mcp_service import get_commit_count
+from services.github_mcp_service import get_commit_counts
+#from service.github_mcp_service import get_commit_count
 
 
 router = APIRouter(prefix="/agent", tags=["Agent Management"])
@@ -77,6 +78,42 @@ async def view_ongoing_tasks(db: Session = Depends(get_db)):
     tasks = db.query(models.ProjectTasks)\
         .filter(models.ProjectTasks.status == 'assigned')\
         .all()
+
+    # 1️⃣ Extract unique repos
+    unique_repos = list({
+        task.github_repo
+        for task in tasks
+        if task.github_repo
+    })
+
+    # 2️⃣ Call MCP once
+    commit_map = await get_commit_counts(unique_repos)
+
+    response = []
+
+    # 3️⃣ Map repo → tasks
+    for task in tasks:
+
+        commit_count = commit_map.get(task.github_repo, 0)
+
+        response.append({
+            "task_id": task.task_id,
+            "project_id": task.project_id,
+            "task_description": task.task_description,
+            "github_repo": task.github_repo,
+            "commit_count": commit_count,
+            "status": task.status
+        })
+
+    # 4️⃣ Return response
+    return response
+'''
+@router.get("/view-ongoing-tasks", response_model=List[OngoingTaskResponse])
+async def view_ongoing_tasks(db: Session = Depends(get_db)):
+
+    tasks = db.query(models.ProjectTasks)\
+        .filter(models.ProjectTasks.status == 'assigned')\
+        .all()
     
     response = []
 
@@ -96,4 +133,4 @@ async def view_ongoing_tasks(db: Session = Depends(get_db)):
 
 
     return response
-
+'''
