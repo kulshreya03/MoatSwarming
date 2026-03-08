@@ -1,137 +1,321 @@
 .page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #020617, #0f172a);
+  background: linear-gradient(135deg,#020617,#0f172a);
   display: flex;
-  align-items: flex-start;
   justify-content: center;
   padding: 60px 20px;
 }
 
-/* Main Container */
 .card {
-  width: 900px;
+  width: 1000px;
   max-width: 100%;
   padding: 40px;
-  border-radius: 20px;
+  border-radius: 22px;
 
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255,255,255,0.06);
   backdrop-filter: blur(18px);
 
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
 }
 
-/* Title */
 .title {
   color: white;
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 700;
   margin-bottom: 35px;
   text-align: center;
-  letter-spacing: 0.5px;
 }
 
-/* Loading & Error */
-.loading {
-  text-align: center;
-  color: #93c5fd;
-  margin-bottom: 20px;
+/* Stats */
+
+.statsGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  margin-bottom:35px;
 }
 
-.error {
-  text-align: center;
-  color: #f87171;
-  margin-bottom: 20px;
+.statCard{
+  padding:22px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.05);
+  text-align:center;
+}
+
+.statNumber{
+  display:block;
+  font-size:32px;
+  font-weight:700;
+  color:#60a5fa;
+}
+
+.statLabel{
+  font-size:13px;
+  opacity:0.75;
+}
+
+/* Action bar */
+
+.actionBar{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:25px;
+}
+
+.refreshButton{
+  background:#3b82f6;
+  border:none;
+  padding:10px 18px;
+  border-radius:10px;
+  color:white;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.refreshButton:hover{
+  background:#2563eb;
+}
+
+/* Messages */
+
+.loading{
+  text-align:center;
+  color:#93c5fd;
+}
+
+.error{
+  text-align:center;
+  color:#f87171;
+}
+
+.empty{
+  text-align:center;
+  opacity:0.6;
 }
 
 /* Task Card */
-.taskCard {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 18px;
 
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.25s ease;
+.taskCard{
+  background:rgba(255,255,255,0.05);
+  padding:22px;
+  border-radius:16px;
+  margin-bottom:18px;
+
+  border:1px solid rgba(255,255,255,0.07);
+  transition:all 0.25s ease;
+  color:white;
 }
 
-.taskCard:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.09);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+.taskCard:hover{
+  transform:translateY(-4px);
+  background:rgba(255,255,255,0.09);
+  box-shadow:0 15px 35px rgba(0,0,0,0.6);
 }
 
 /* Header */
-.taskHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+
+.taskHeader{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:12px;
 }
 
-.taskId {
-  font-weight: 600;
-  font-size: 15px;
-  opacity: 0.9;
+.taskId{
+  font-weight:600;
 }
 
-/* Status Badge */
-.status {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: capitalize;
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.3);
+.status{
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+
+  background:rgba(34,197,94,0.15);
+  color:#22c55e;
+  border:1px solid rgba(34,197,94,0.35);
+}
+
+/* Project section */
+
+.projectSection{
+  margin-bottom:10px;
+}
+
+.projectLabel{
+  font-size:12px;
+  opacity:0.6;
+  margin-right:6px;
+}
+
+.projectId{
+  font-weight:600;
 }
 
 /* Description */
-.taskCard p {
-  margin-bottom: 16px;
-  font-size: 14px;
-  line-height: 1.5;
-  opacity: 0.9;
+
+.description{
+  margin-bottom:16px;
+  font-size:14px;
+  line-height:1.5;
+  opacity:0.9;
 }
 
-/* Repository Button */
-.taskCard a {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: #3b82f6;
-  color: white;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  transition: 0.2s ease;
+/* Commits */
+
+.commitSection{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
 }
 
-.taskCard a:hover {
-  background: #2563eb;
-  transform: scale(1.05);
+.commitLabel{
+  opacity:0.7;
 }
 
-/* Commit Section */
-.commitSection {
+.commitCount{
+  background:rgba(59,130,246,0.15);
+  color:#60a5fa;
+  padding:4px 10px;
+  border-radius:12px;
+  font-weight:600;
+  border:1px solid rgba(59,130,246,0.35);
+}
+
+.noCommits{
+  background:rgba(248,113,113,0.15);
+  color:#f87171;
+  border:1px solid rgba(248,113,113,0.35);
+}
+
+/* Activity */
+
+.activityIndicator{
+  font-size:12px;
+  opacity:0.8;
+  margin-bottom:14px;
+}
+
+/* Repo Button */
+
+.repoButton{
+  display:inline-block;
+  padding:8px 16px;
+  border-radius:10px;
+
+  background:#3b82f6;
+  color:white;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:500;
+}
+
+.repoButton:hover{
+  background:#2563eb;
+}
+
+/* Loader Container */
+
+.loaderContainer {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* Loader Text */
+
+.loadingText {
+  margin-top: 14px;
   font-size: 14px;
-}
-
-.commitLabel {
   opacity: 0.7;
+  color: #fff;
 }
 
-.commitCount {
-  background: rgba(59,130,246,0.15);
-  color: #60a5fa;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 600;
-  border: 1px solid rgba(59,130,246,0.35);
+/* Loader Animation */
+
+.loader {
+  box-sizing: border-box;
+  display: inline-block;
+  width: 50px;
+  height: 80px;
+  border-top: 5px solid #fff;
+  border-bottom: 5px solid #fff;
+  position: relative;
+  background: linear-gradient(#FF3D00 30px, transparent 0) no-repeat;
+  background-size: 2px 40px;
+  background-position: 50% 0px;
+  animation: spinx 5s linear infinite;
+}
+
+.loader:before,
+.loader:after {
+  content: "";
+  width: 40px;
+  left: 50%;
+  height: 35px;
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 0 0 20px 20px;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: 0 0px;
+  animation: lqt 5s linear infinite;
+}
+
+.loader:after {
+  top: auto;
+  bottom: 0;
+  border-radius: 20px 20px 0 0;
+  animation: lqb 5s linear infinite;
+}
+
+@keyframes lqt {
+  0%, 100% {
+    background-image: linear-gradient(#FF3D00 40px, transparent 0);
+    background-position: 0% 0px;
+  }
+
+  50% {
+    background-image: linear-gradient(#FF3D00 40px, transparent 0);
+    background-position: 0% 40px;
+  }
+
+  50.1% {
+    background-image: linear-gradient(#FF3D00 40px, transparent 0);
+    background-position: 0% -40px;
+  }
+}
+
+@keyframes lqb {
+  0% {
+    background-image: linear-gradient(#FF3D00 40px, transparent 0);
+    background-position: 0 40px;
+  }
+
+  100% {
+    background-image: linear-gradient(#FF3D00 40px, transparent 0);
+    background-position: 0 -40px;
+  }
+}
+
+@keyframes spinx {
+  0%, 49% {
+    transform: rotate(0deg);
+    background-position: 50% 36px;
+  }
+
+  51%, 98% {
+    transform: rotate(180deg);
+    background-position: 50% 4px;
+  }
+
+  100% {
+    transform: rotate(360deg);
+    background-position: 50% 36px;
+  }
 }
