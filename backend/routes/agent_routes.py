@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Form
 from pydantic import BaseModel
 from typing import Annotated, List
 from fastapi import UploadFile, File
@@ -46,7 +46,10 @@ class OngoingTaskResponse(BaseModel):
 
 
 @router.post("/extract-skills")
-async def extract_skills(resume:UploadFile = File(...)):
+async def extract_skills(
+    resume:UploadFile = File(...),
+    user_id: int = Form(...),
+    db: Session = Depends(get_db)):
     
     reader = PyPDF2.PdfReader(resume.file)
     text = ""
@@ -55,15 +58,64 @@ async def extract_skills(resume:UploadFile = File(...)):
 
     #calling agent
     skills = extract_skills_from_text(text)
-    state["resume_text"] = skills
+
+    #Fetching from db
+    existing = db.query(models.UserSkills).filter(
+        models.UserSkills.user_id == user_id
+    ).first()
+
+    if existing:
+        existing.skills = skills
+
+    else:
+        new_skills = models.UserSkills(
+            user_id=user_id,
+            skills=skills
+        )
+        db.add(new_skills)
+
+    db.commit()
+
+    #state["resume_text"] = skills
     return {"skills": skills}
 
-@router.get("/view-tasks")
-async def view_tasks():
+#Fetch previously saved skills
+@router.get("/user/skills/{user_id}")
+def get_user_skills(user_id:int, db:Session = Depends(get_db)):
+
+    skills = db.query(models.UserSkills).filter(
+        models.UserSkills.user_id == user_id
+    ).first()
+
+    if not skills:
+        return {"skills": None}
+
+    return {"skills": skills.skills}
+
+#Edit skills
+@router.put("/user/skills")
+async def update_skills(
+    user_id:int,
+    skills:dict,
+    db:Session = Depends(get_db)
+):
+
+    record = db.query(models.UserSkills).filter(
+        models.UserSkills.user_id == user_id
+    ).first()
+
+    record.skills = skills
+
+    db.commit()
+
+    return {"message":"skills updated"}
+
+@router.get("/view-tasks/{user_id}")
+async def view_tasks(user_id:int, db: Session = Depends(get_db)):
     """Fetch all tasks from the database"""
-    db = SessionLocal()
+    #db = SessionLocal()
     try:
-        tasks = match_skills_to_tasks(db)
+        tasks = match_skills_to_tasks(db,user_id)
         if not tasks:
             return []
         return tasks

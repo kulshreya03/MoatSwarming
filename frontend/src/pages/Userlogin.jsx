@@ -47,7 +47,9 @@ export function UserLogin() {
       }
 
       const user = await response.json(); //User id
-      localStorage.setItem("user", JSON.stringify(user)); //Token
+      localStorage.setItem("user_id", user.id);  //Token
+      localStorage.setItem("user_name", user.name);
+      localStorage.setItem("user_email", user.email);
       
       navigate("/UserPage");
     }

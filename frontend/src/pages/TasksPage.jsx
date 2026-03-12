@@ -7,11 +7,13 @@ export function TasksPage() {
   const [error, setError] = useState(null);
   const [submittingTasks, setSubmittingTasks] = useState(new Set());
 
+  const userId = localStorage.getItem("user_id");
+
   
     const fetchTasks = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/agent/view-tasks"
+          `http://localhost:8000/agent/view-tasks/${userId}`
         );
 
         if (!response.ok) {

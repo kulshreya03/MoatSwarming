@@ -19,7 +19,7 @@ def get_db():
 
 
 
-def match_skills_to_tasks(db:Session):
+def match_skills_to_tasks(db:Session, user_id:int):
 
     #Check if status is pending, display task only if status:pending
     tasks = db.query(models.ProjectTasks).filter(models.ProjectTasks.status == "pending").all()
@@ -35,22 +35,31 @@ def match_skills_to_tasks(db:Session):
                 "github_repo": task.github_repo,
                 "status": task.status
             })    
-
-
     print("Task List:", task_list)
 
-    resume_skills = state["resume_skills"]
+    #resume_skills = state["resume_skills"]
     #print(resume_skills)
+    user_skills = db.query(models.UserSkills).filter(
+        models.UserSkills.user_id == user_id
+    ).first()
+    if not user_skills:
+        return []
+    resume_skills = user_skills.skills
+
     if not resume_skills:
         return []
 
     # Flatten categorized skills → single list
-    flat_skills = state["flat_skills"]
+    #flat_skills = state["flat_skills"]
+    flat_skills = []
+
+    for category in resume_skills.values():
+        flat_skills.extend([s.lower() for s in category])
     print("Resume skills:", flat_skills)
 
 
     #New Additions
-    skill_lookup = state["skill_lookup"]
+    skill_lookup = set(flat_skills)
 
     filtered_tasks = []
 

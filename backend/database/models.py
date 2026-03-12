@@ -1,5 +1,7 @@
 from database.database import Base
-from sqlalchemy import UUID, Column, ForeignKey, Integer, String
+from sqlalchemy import UUID, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy.dialects.postgresql import JSON
+from datetime import datetime
 
 class Users(Base):
     __tablename__ = 'users'
@@ -24,6 +26,13 @@ class ProjectTasks(Base):
     task_description = Column(String)
     github_repo = Column(String)
     status = Column(String, default="pending")
+
+class UserSkills(Base):
+    __tablename__ = "user_skills"
+
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    skills = Column(JSON)
+    updated_at = Column(DateTime, default=datetime.utcnow)
 
 
 '''
