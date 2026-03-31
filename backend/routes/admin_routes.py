@@ -205,3 +205,64 @@ def create_project(request: ProjectCreateRequest, db: Session = Depends(get_db))
         db.rollback()
         print("🔥 FINAL ERROR:", str(e))
         raise HTTPException(status_code=500, detail=str(e))
+
+class TaskUpdateRequest(BaseModel):
+    task_id: int
+
+@router.put("/update-task-status")
+async def update_task_status(
+    request: TaskUpdateRequest,
+    db: Session = Depends(get_db)
+):
+
+    # 1️⃣ Fetch task
+    task = db.query(models.ProjectTasks).filter(
+        models.ProjectTasks.task_id == request.task_id
+    ).first()
+
+    # 2️⃣ Not found
+    if not task:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Task with id {request.task_id} not found"
+        )
+
+    # 3️⃣ Update status
+    task.status = "completed"
+
+    # 4️⃣ Move to completed table
+    completed_task = models.TaskCompleted(
+        task_id=task.task_id,
+        project_id=task.project_id,
+        task_description=task.task_description,
+        github_repo=task.github_repo
+    )
+
+    db.add(completed_task)
+
+    # 5️⃣ Remove from assignments (IMPORTANT)
+    db.query(models.TaskAssignments).filter(
+        models.TaskAssignments.task_id == task.task_id
+    ).delete()
+
+    db.commit()
+
+    return {"message": "Task marked as completed"}
+
+
+@router.get("/completed-tasks")
+async def get_completed_tasks(db: Session = Depends(get_db)):
+
+    tasks = db.query(models.TaskCompleted).all()
+
+    return [
+        {
+            "completed_id": t.completed_id,
+            "task_id": t.task_id,
+            "project_id": t.project_id,
+            "task_description": t.task_description,
+            "github_repo": t.github_repo,
+            "completed_at": t.completed_at
+        }
+        for t in tasks
+    ]

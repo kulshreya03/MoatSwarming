@@ -47,11 +47,19 @@ class Admin(Base):
 class TaskAssignments(Base):
     __tablename__ = 'task_assignments'
     
-    assignment_id = Column(Integer, primary_key=True, index=True)
+    assignment_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     task_id = Column(Integer, ForeignKey('project_tasks.task_id'))
     user_id = Column(Integer, ForeignKey('users.id'))
 
+class TaskCompleted(Base):
+    __tablename__ = "task_completed"
 
+    completed_id = Column(Integer, primary_key=True, index=True)
+    task_id = Column(Integer)
+    project_id = Column(Integer)
+    task_description = Column(String)
+    github_repo = Column(String)
+    completed_at = Column(DateTime, default=datetime.utcnow)
 '''
 class UserSkills(Base):
     __tablename__ = 'user_skills'

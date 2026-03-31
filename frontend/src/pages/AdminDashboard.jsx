@@ -13,8 +13,8 @@ export function AdminDashboard() {
     project_name: "",
     github_repo: ""
   });
-
   const [generatedTasks, setGeneratedTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
 
   const [stats, setStats] = useState({
     totalProjects: 0,
@@ -114,6 +114,58 @@ export function AdminDashboard() {
     }
   };
 
+  //Mark Tasks Complete
+  const markTaskComplete = async (taskId) => {
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/admin/update-task-status",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ task_id: taskId }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to update");
+      }
+
+      alert("✅ Task marked as completed");
+
+      // Refresh tasks
+      fetchTasks();
+
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to update task");
+    }
+  };
+
+  //Fetch Completed Tasks
+  const fetchCompletedTasks = async () => {
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/admin/completed-tasks"
+      );
+
+      const data = await response.json();
+      setCompletedTasks(data);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch users data
   const fetchUsers = async () => {
 
@@ -158,6 +210,13 @@ export function AdminDashboard() {
           fetchTasks();
         }}>
           📋 View Tasks
+        </button>
+
+        <button onClick={() => {
+          setActiveTab("completed");
+          fetchCompletedTasks();
+        }}>
+          ✅ Completed Tasks
         </button>
 
         <button onClick={() => setActiveTab("create")}>
@@ -301,6 +360,84 @@ export function AdminDashboard() {
                   {task.commit_count === 0
                     ? "⚠ No development activity yet"
                     : "🔥 Active development"}
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+
+                  <a
+                    href={task.github_repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.repoButton}
+                  >
+                    View Repository
+                  </a>
+
+                  {task.status !== "completed" && (
+                    <button
+                      className={styles.primaryBtn}
+                      onClick={() => markTaskComplete(task.task_id)}
+                    >
+                      ✅ Mark Complete
+                    </button>
+                  )}
+
+                </div>
+
+              </div>
+
+            ))}
+          </>
+        )}
+
+        {/* COMPLETED TASKS */}
+        {activeTab === "completed" && (
+          <>
+            <h1 className={styles.title}>Completed Tasks 🎉</h1>
+
+            {loading && (
+              <div className={styles.loaderContainer}>
+                <div className={styles.loader}></div>
+                <p>Loading completed tasks...</p>
+              </div>
+            )}
+
+            {completedTasks.length === 0 && !loading && (
+              <p className={styles.empty}>
+                No completed tasks yet
+              </p>
+            )}
+
+            {completedTasks.map((task) => (
+
+              <div key={task.completed_id} className={styles.completedCard}>
+
+                <div className={styles.taskHeader}>
+                  <span className={styles.taskId}>
+                    Task #{task.task_id}
+                  </span>
+
+                  <span className={`${styles.status} ${styles.completed}`}>
+                    Completed
+                  </span>
+                </div>
+
+                <div className={styles.projectSection}>
+                  <span className={styles.projectLabel}>
+                    Project
+                  </span>
+
+                  <span className={styles.projectId}>
+                    {task.project_id}
+                  </span>
+                </div>
+
+                <p className={styles.description}>
+                  {task.task_description}
+                </p>
+
+                <div className={styles.activityIndicator}>
+                  ✅ Successfully completed
                 </div>
 
                 <a
