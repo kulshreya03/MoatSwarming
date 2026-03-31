@@ -21,7 +21,7 @@ class Project(Base):
 class ProjectTasks(Base):
     __tablename__ = 'project_tasks'
     
-    task_id = Column(Integer, primary_key=True, index=True)
+    task_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     project_id = Column(Integer, ForeignKey('projects.project_id'))
     task_description = Column(String)
     github_repo = Column(String)

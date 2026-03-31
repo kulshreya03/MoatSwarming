@@ -9,6 +9,13 @@ export function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [projectData, setProjectData] = useState({
+    project_name: "",
+    github_repo: ""
+  });
+
+  const [generatedTasks, setGeneratedTasks] = useState([]);
+
   const [stats, setStats] = useState({
     totalProjects: 0,
     totalTasks: 0,
@@ -17,6 +24,54 @@ export function AdminDashboard() {
     totalCommits: 0,
     productivity: 0
   });
+
+   // 🔹 Handle input
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProjectData({
+      ...projectData,
+      [name]: value
+    });
+  };
+
+  // 🔹 CREATE PROJECT + CALL AI
+  const handleCreateProject = async () => {
+
+    if (!projectData.project_name || !projectData.github_repo) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/admin/create-project",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(projectData)
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Something went wrong");
+      }
+
+      setGeneratedTasks(data.tasks || []);
+      alert("✅ Project created & tasks generated!");
+
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to create project");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 🔹 Fetch dashboard stats
   const fetchDashboardData = async () => {
@@ -269,9 +324,59 @@ export function AdminDashboard() {
             <h1>Create Project</h1>
             <p>Upload project details and decompose into tasks 🚀</p>
 
-            <button className={styles.primaryBtn}>
-              Upload Project
-            </button>
+            {/* FORM */}
+            <div className={styles.form}>
+
+              <input
+                type="text"
+                name="project_name"
+                placeholder="Project Name"
+                value={projectData.project_name}
+                onChange={handleInputChange}
+                className={styles.input}
+              />
+
+              <input
+                type="text"
+                name="github_repo"
+                placeholder="GitHub Repository Link"
+                value={projectData.github_repo}
+                onChange={handleInputChange}
+                className={styles.input}
+              />
+
+              <button
+                onClick={handleCreateProject}
+                className={styles.primaryBtn}
+              >
+                🚀 Create & Decompose
+              </button>
+
+            </div>
+
+            {/* LOADER */}
+            {loading && (
+              <div className={styles.loaderContainer}>
+                <div className={styles.loader}></div>
+                <p>Generating tasks using AI...</p>
+              </div>
+            )}
+
+            {/* GENERATED TASKS */}
+            {generatedTasks.length > 0 && (
+              <div className={styles.generatedSection}>
+                <h2>🧠 AI Generated Tasks</h2>
+
+                {generatedTasks.map((task, index) => (
+                  <div key={index} className={styles.taskCard}>
+                    <p>{task.task_description}</p>
+                    <span className={styles.repoLink}>
+                      {task.github_repo}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

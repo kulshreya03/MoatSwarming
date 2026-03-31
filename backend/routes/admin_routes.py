@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.database import SessionLocal
 import database.models as models
@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from services.github_mcp_service import get_commit_counts
 from typing import List
 from collections import defaultdict
+from pydantic import BaseModel
+from agents.task_decompose import task_decompose
 
 router = APIRouter(prefix="/admin",tags=["Admin Dashboard Management"])
 
@@ -115,3 +117,91 @@ async def get_users_with_tasks(db: Session = Depends(get_db)):
         })
 
     return result
+
+
+class ProjectCreateRequest(BaseModel):
+    project_name: str
+    github_repo: str
+
+@router.post("/create-project")
+def create_project(request: ProjectCreateRequest, db: Session = Depends(get_db)):
+
+    try:
+        print("📌 Incoming Request:", request)
+
+        # -----------------------------
+        # 1️⃣ Create Project
+        # -----------------------------
+        new_project = models.Project(
+            project_name=request.project_name
+        )
+
+        db.add(new_project)
+        db.commit()
+        db.refresh(new_project)
+
+        print("✅ Project Created:", new_project.project_id)
+
+        # -----------------------------
+        # 2️⃣ Generate Tasks (AI)
+        # -----------------------------
+        tasks = task_decompose(request.project_name)
+
+        if not tasks:
+            raise Exception("Task generation failed")
+
+        created_tasks = []
+
+        # -----------------------------
+        # 3️⃣ Insert Tasks Safely
+        # -----------------------------
+        for task in tasks:
+
+            if not isinstance(task, dict):
+                continue
+
+            description = task.get("task_description")
+
+            if not description:
+                continue
+
+            try:
+                new_task = models.ProjectTasks(
+                    project_id=new_project.project_id,
+                    task_description=description,
+                    github_repo=request.github_repo,
+                    status="pending"
+                )
+
+                db.add(new_task)
+
+                created_tasks.append({
+                    "task_description": description,
+                    "github_repo": request.github_repo,
+                    "status": "pending"
+                })
+
+            except Exception as task_error:
+                print("❌ TASK INSERT ERROR:", str(task_error))
+                continue
+
+        # -----------------------------
+        # 4️⃣ Final Commit
+        # -----------------------------
+        db.commit()
+
+        print("✅ Tasks Inserted:", created_tasks)
+
+        # -----------------------------
+        # 5️⃣ Response
+        # -----------------------------
+        return {
+            "project_id": new_project.project_id,
+            "project_name": new_project.project_name,
+            "tasks": created_tasks
+        }
+
+    except Exception as e:
+        db.rollback()
+        print("🔥 FINAL ERROR:", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
