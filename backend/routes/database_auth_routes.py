@@ -18,6 +18,12 @@ class LoginResponse(BaseModel):
     name: str
     email: str
 
+class LoginAdminResponse(BaseModel):
+    admin_id: int
+    admin_name: str
+    admin_email: str
+    project_id: int
+
 #Coonect to DB
 def get_db():
     db = SessionLocal()
@@ -42,3 +48,20 @@ async def login(request: LoginRequest, db: db_dependency):
         }
 
     #return LoginResponse(id=user.id, name=user.name, email=user.email)
+
+@router.post("/admin-login", response_model=LoginAdminResponse)
+async def admin_login(request: LoginRequest, db: db_dependency):
+    admin = db.query(models.Admin).filter(
+        models.Admin.email == request.email,
+        models.Admin.password == request.password
+    ).first()
+
+    if not admin:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    return {
+        "admin_id": admin.admin_id,
+        "admin_name": admin.name,
+        "admin_email": admin.email,
+        "project_id": admin.project_id
+    }

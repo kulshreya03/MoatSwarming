@@ -195,3 +195,25 @@
 
   font-size: 13px;
 }
+
+.topBar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.logoutButton {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.logoutButton:hover {
+  background-color: #d9363e;
+}

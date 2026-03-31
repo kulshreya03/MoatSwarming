@@ -34,6 +34,16 @@ class UserSkills(Base):
     skills = Column(JSON)
     updated_at = Column(DateTime, default=datetime.utcnow)
 
+class Admin(Base):
+    __tablename__ = "admin"
+
+    admin_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    email = Column(String, unique=True, index=True)
+    password = Column(String)
+
+    project_id = Column(Integer, ForeignKey("projects.project_id"))
+
 
 '''
 class UserSkills(Base):

@@ -5,20 +5,53 @@ import styles from "../css/AdminLogin.module.css";
 export function AdminLogin() {
   const navigate = useNavigate();
 
-  const [adminId, setAdminId] = useState("");
-  const [organization, setOrganization] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  function handleEmail(event) {
+    setEmail(event.target.value);
+  }
 
-    if (!adminId || !organization || !password) {
-      alert("Please fill all fields");
+  function handlePassword(event) {
+    setPassword(event.target.value);
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill all the fields");
       return;
     }
 
-    // Temporary navigation (replace with API call later)
-    navigate("/AdminDashboard");
+    try {
+      const response = await fetch("http://localhost:8000/auth/admin-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || "Login failed");
+      }
+
+      const admin = await response.json();
+
+      // Store admin details
+      localStorage.setItem("admin_id", admin.admin_id);
+      localStorage.setItem("admin_name", admin.admin_name);
+      localStorage.setItem("admin_email", admin.admin_email);
+      localStorage.setItem("project_id", admin.project_id);
+
+      navigate("/AdminDashboard");
+    } catch (error) {
+      setError(error.message);
+    }
   }
 
   return (
@@ -28,27 +61,21 @@ export function AdminLogin() {
 
         <input
           type="text"
-          placeholder="Enter Admin ID"
+          placeholder="Enter your Email"
           className={styles.input}
-          value={adminId}
-          onChange={(e) => setAdminId(e.target.value)}
-        />
-
-        <input
-          type="text"
-          placeholder="Enter Organization"
-          className={styles.input}
-          value={organization}
-          onChange={(e) => setOrganization(e.target.value)}
+          value={email}
+          onChange={handleEmail}
         />
 
         <input
           type="password"
-          placeholder="Enter Password"
+          placeholder="Enter your password"
           className={styles.input}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={handlePassword}
         />
+
+        {error && <div className={styles.error}>{error}</div>}
 
         <button className={styles.button} onClick={handleSubmit}>
           Login

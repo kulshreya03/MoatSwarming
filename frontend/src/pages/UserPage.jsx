@@ -17,6 +17,23 @@ export function UserPage() {
   const [editText, setEditText] = useState("");
 
 
+  /* ---- LOGOUT --- */
+  function handleLogout() 
+  {
+
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (!confirmLogout) return;
+    // Clear all stored user data
+    localStorage.removeItem("user");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("user_email");
+    // localStorage.clear();
+
+    navigate("/UserLogin"); // redirect to login page
+  }
+
+
 
   /* ---------------- FETCH EXISTING SKILLS ---------------- */
 
@@ -153,6 +170,12 @@ export function UserPage() {
 
   return (
     <div className={styles.page}>
+
+      <div className={styles.topBar}>
+        <button onClick={handleLogout} className={styles.logoutButton}>
+          Logout
+        </button>
+      </div>
 
       <h3 className={styles.header}>
         Welcome, ChatGPT Certified Senior Developer 🧠
