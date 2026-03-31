@@ -6,6 +6,7 @@ import { UserLogin } from './pages/Userlogin';
 import { TasksPage } from './pages/TasksPage';
 import { AdminLogin } from './pages/AdminLogin';
 import { AdminPage } from './pages/AdminPage';
+import { AdminDashboard } from './pages/AdminDashboard';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
               <Route path="/TasksPage" element={<TasksPage/>}></Route>
               <Route path="/AdminLogin" element={<AdminLogin/>}> </Route>
               <Route path="/AdminPage" element={<AdminPage/>}></Route>
+              <Route path="/AdminDashboard" element={<AdminDashboard/>}></Route>
           </Routes>
         </BrowserRouter>
     </>

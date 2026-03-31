@@ -1,0 +1,296 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #020617, #0f172a);
+  color: white;
+}
+
+/* Sidebar */
+
+.sidebar {
+  width: 240px;
+  padding: 30px 20px;
+  background: rgba(255,255,255,0.05);
+  border-right: 1px solid rgba(255,255,255,0.08);
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.logo {
+  margin-bottom: 25px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.sidebar button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: left;
+}
+
+.sidebar button:hover {
+  background: rgba(59,130,246,0.5);
+}
+
+/* Main */
+
+.main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 25px;
+}
+
+/* Grid */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.06);
+  padding: 25px;
+  border-radius: 16px;
+  text-align: center;
+  transition: 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  background: rgba(255,255,255,0.1);
+}
+
+.card h3 {
+  font-size: 28px;
+  color: #60a5fa;
+}
+
+.card p {
+  opacity: 0.7;
+}
+
+/* Actions */
+
+.actions {
+  margin-top: 30px;
+}
+
+.primaryBtn {
+  background: #3b82f6;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.primaryBtn:hover {
+  background: #2563eb;
+}
+
+/* Task Cards */
+
+.taskCard {
+  background: rgba(255,255,255,0.05);
+  padding: 22px;
+  border-radius: 16px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255,255,255,0.07);
+  transition: all 0.25s ease;
+}
+
+.taskCard:hover {
+  transform: translateY(-4px);
+  background: rgba(255,255,255,0.09);
+}
+
+/* Header */
+
+.taskHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.taskId {
+  font-weight: 600;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  background: rgba(34,197,94,0.15);
+  color: #22c55e;
+}
+
+/* Project */
+
+.projectSection {
+  margin-bottom: 10px;
+}
+
+.projectLabel {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.projectId {
+  font-weight: 600;
+}
+
+/* Description */
+
+.description {
+  margin-bottom: 16px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Commits */
+
+.commitSection {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.commitCount {
+  background: rgba(59,130,246,0.15);
+  color: #60a5fa;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.noCommits {
+  background: rgba(248,113,113,0.15);
+  color: #f87171;
+}
+
+/* Activity */
+
+.activityIndicator {
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+
+/* Repo */
+
+.repoButton {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: white;
+  text-decoration: none;
+}
+
+.repoButton:hover {
+  background: #2563eb;
+}
+
+/* Loader */
+
+.loaderContainer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.loader {
+  margin: auto;
+  width: 40px;
+  height: 40px;
+  border: 4px solid white;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty */
+
+.empty {
+  text-align: center;
+  opacity: 0.6;
+}
+
+/* Create Section */
+
+.createSection {
+  text-align: center;
+  margin-top: 50px;
+}
+
+/* USER SECTION */
+
+.userCard {
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+.userHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.userHeader h3 {
+  margin: 0;
+}
+
+.userHeader span {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* Task inside user */
+
+.userTask {
+  background: rgba(255,255,255,0.06);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.userTaskTop {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.commitRow {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.commitRow span {
+  margin-left: 8px;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.noTask {
+  opacity: 0.6;
+  font-size: 14px;
+}

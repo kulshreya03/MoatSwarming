@@ -41,7 +41,7 @@ export function TasksPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/tasks/update-status?task_id=${taskId}`,
+        `http://localhost:8000/tasks/update-status?task_id=${taskId}&user_id=${userId}`,
         { method: "POST" }
       );
 

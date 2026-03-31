@@ -17,7 +17,7 @@ def get_db():
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 @router.post("/update-status")
-async def update_task_status(task_id: int, db: Session = Depends(get_db)):
+async def update_task_status(task_id: int,user_id:int, db: Session = Depends(get_db)):
 
 
     print(task_id)
@@ -37,6 +37,12 @@ async def update_task_status(task_id: int, db: Session = Depends(get_db)):
     # 3️⃣ Update status
     task.status = "assigned"
 
+    new_assignment = models.TaskAssignments(
+        task_id=task_id,
+        user_id=user_id
+    )
+    db.add(new_assignment)
+
     # 4️⃣ Commit changes
     db.commit()
     db.refresh(task)
@@ -45,6 +51,7 @@ async def update_task_status(task_id: int, db: Session = Depends(get_db)):
     return {
         "message": "Task status updated successfully",
         "task_id": task.task_id,
+        "assigned_to": user_id,
         "new_status": task.status
     }
 
