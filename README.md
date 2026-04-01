@@ -17,15 +17,16 @@ MoatSwarming/
 │   │   ├── models.py       # ORM models
 │   │   └── db_schema.txt   # Schema description
 │   ├── routes/             # API route definitions
-│   │   ├── agent_routes.py
-│   │   ├── database_auth_routes.py
-│   │   └── tasks_routes.py
+│   │   ├── admin_routes.py # Admin dashboard and project management
+│   │   ├── agent_routes.py # Agent skills and task matching
+│   │   ├── database_auth_routes.py # Authentication endpoints
+│   │   └── tasks_routes.py # Task status updates
 │   ├── services/           # External service integrations
-│   │   └── github_mcp_service.py
+│   │   └── github_mcp_service.py # GitHub commit analytics via MCP
 │   ├── agents/             # Agent skills and behavior modules
-│   │   ├── skill_extract.py
-│   │   ├── skill_match.py
-│   │   └── task_decompose.py
+│   │   ├── skill_extract.py # Resume PDF skill extraction
+│   │   ├── skill_match.py  # Skill-to-task matching algorithm
+│   │   └── task_decompose.py # AI-powered project task decomposition
 │   ├── alembic.ini         # DB migration config
 │   ├── alembic/            # Migration scripts
 │   └── __pycache__/
@@ -35,7 +36,16 @@ MoatSwarming/
 │   │   ├── App.css        # Application styles
 │   │   ├── index.css      # Global styles
 │   │   ├── main.jsx       # React entry point
-│   │   └── assets/        # Static assets
+│   │   ├── assets/        # Static assets
+│   │   ├── pages/         # Page components
+│   │   │   ├── AdminDashboard.jsx # Admin project and task management
+│   │   │   ├── AdminLogin.jsx     # Admin authentication
+│   │   │   ├── AdminPage.jsx      # Admin interface
+│   │   │   ├── HomePage.jsx       # Landing page
+│   │   │   ├── TasksPage.jsx      # Task viewing and assignment
+│   │   │   ├── Userlogin.jsx      # User authentication
+│   │   │   └── UserPage.jsx       # User dashboard
+│   │   └── css/           # CSS modules for styling
 │   ├── public/            # Public static files
 │   ├── package.json       # Node.js dependencies
 │   ├── vite.config.js     # Vite configuration
@@ -54,11 +64,19 @@ The backend has evolved beyond a simple "main.py"; it now includes state managem
 - **FastAPI** - Modern Python web framework
 - **Uvicorn** - ASGI server for running FastAPI
 - **SQLAlchemy** - Database toolkit and ORM
+- **PostgreSQL** - Database (via psycopg2-binary)
+- **Alembic** - Database migration tool
+- **LangChain** - LLM integration framework
+- **LangGraph** - Graph-based agent orchestration
+- **Google Generative AI** - AI model provider
+- **PyPDF2** - PDF processing for resume extraction
+- **MCP (Model Context Protocol)** - GitHub integration client
 - **GitHub MCP service** - Integration for agent coordination and commit analytics
 
 ### Frontend
 - **React** (v19.2.0) - UI library
 - **Vite** (v7.2.4) - Build tool and dev server
+- **React Router DOM** (v7.11.0) - Client-side routing
 - **ESLint** (v9.39.1) - Code linting
 
 
@@ -66,8 +84,12 @@ The backend has evolved beyond a simple "main.py"; it now includes state managem
 
 - **Agent Skill Processing** – Upload resumes for PDF skill extraction (`/agent/extract-skills`) and match candidates to tasks based on a skill matrix.
 - **Task Discovery** – View available tasks and ongoing assignments including GitHub commit counts to monitor progress (`/agent/view-tasks`, `/agent/view-ongoing-tasks`).
-- **Authentication** – Secure login endpoint for users (`/auth/login`) with database validation.
+- **Authentication** – Secure login endpoint for users (`/auth/login`) and admins (`/auth/admin-login`) with database validation.
 - **Task Management** – Endpoints to update task status and manage assignments (`/tasks/update-status`).
+- **Admin Dashboard** – Comprehensive admin interface for project creation, task decomposition using AI, dashboard metrics, user management, and task completion tracking (`/admin/dashboard`, `/admin/create-project`, `/admin/users-with-tasks`, `/admin/update-task-status`, `/admin/completed-tasks`).
+- **AI-Powered Task Decomposition** – Automatically generate project tasks using LLM when creating new projects.
+- **Skill Matching Algorithm** – Intelligent matching of user skills to project tasks using both rule-based and AI-powered approaches.
+- **GitHub Integration** – Real-time commit count tracking via MCP for progress monitoring.
 - **Modular Backend** – State management, graph utilities, and LLM integration in separate modules.
 - **Database Layer** – SQLAlchemy models with Alembic migrations and a documented schema in `database/db_schema.txt`.
 - **Frontend Structure** – React pages organized with CSS modules for admin/user workflows; real-time data fetched from backend APIs.
@@ -80,6 +102,9 @@ The architecture supports evolution toward a comprehensive moat analysis and col
 - **Python 3.7+** (for backend)
 - **Node.js 16+** (for frontend)
 - **npm or yarn** (for package management)
+- **PostgreSQL** (database)
+- **GitHub Personal Access Token** (for MCP integration)
+- **GitHub MCP Server** (path to the MCP executable)
 
 ## Installation & Setup
 
@@ -110,6 +135,14 @@ The architecture supports evolution toward a comprehensive moat analysis and col
    - `fastapi` - Web framework
    - `uvicorn` - ASGI server
    - `sqlalchemy` - Database ORM
+   - `psycopg2-binary` - PostgreSQL driver
+   - `alembic` - Database migrations
+   - `langchain` - LLM framework
+   - `langgraph` - Graph-based orchestration
+   - `langchain-google-genai` - Google AI integration
+   - `python-multipart` - File upload handling
+   - `PyPDF2` - PDF processing
+   - `mcp` - Model Context Protocol client
 
 4. **Run the backend server:**
    ```bash
@@ -122,10 +155,18 @@ The architecture supports evolution toward a comprehensive moat analysis and col
    - `GET /` – Welcome message
    - `GET /health` – Health check
    - `POST /auth/login` – Authenticate user with email/password
+   - `POST /auth/admin-login` – Authenticate admin with email/password
    - `POST /agent/extract-skills` – Upload a resume (PDF) and extract skills via agent
-   - `GET /agent/view-tasks` – Retrieve tasks matched to current skills
+   - `GET /agent/user/skills/{user_id}` – Retrieve stored skills for a user
+   - `PUT /agent/user/skills` – Update skills for a user
+   - `GET /agent/view-tasks/{user_id}` – Retrieve tasks matched to current skills
    - `GET /agent/view-ongoing-tasks` – Admin view of assigned tasks with GitHub commit counts
-   - `POST /tasks/update-status?task_id=<id>` – Mark a task as assigned
+   - `POST /tasks/update-status?task_id=<id>&user_id=<id>` – Mark a task as assigned
+   - `GET /admin/dashboard` – Get admin dashboard metrics
+   - `GET /admin/users-with-tasks` – Get users and their assigned tasks
+   - `POST /admin/create-project` – Create a new project and generate tasks using AI
+   - `PUT /admin/update-task-status` – Mark a task as completed
+   - `GET /admin/completed-tasks` – Retrieve completed tasks
    - API documentation available at `http://localhost:8000/docs` (Swagger UI)
 
 ### Frontend Setup
@@ -144,6 +185,7 @@ The architecture supports evolution toward a comprehensive moat analysis and col
    - React and React DOM
    - Vite and related plugins
    - ESLint and linting tools
+   - React Router DOM for routing
 
 3. **Run the development server:**
    ```bash
