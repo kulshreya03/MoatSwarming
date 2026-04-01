@@ -56,8 +56,8 @@ async def get_admin_dashboard(db: Session = Depends(get_db)):
     if totalTasks > 0:
         productivity = round((completedTasks / totalTasks) * 100)
 
-    # 6️⃣ Total Projects (from Admin table)
-    totalProjects = db.query(models.Admin).count()
+    # 6️⃣ Total Projects (from Projects table)
+    totalProjects = db.query(models.Project).count()
 
     return {
         "totalProjects": totalProjects,
