@@ -333,3 +333,83 @@ async def get_completed_tasks(db: Session = Depends(get_db)):
         }
         for t in tasks
     ]
+
+@router.get("/equity-distribution")
+async def get_equity_distribution(db: Session = Depends(get_db)):
+    """
+    Equity distribution using Contributions table (Slicing Pie method)
+    """
+
+    projects = db.query(models.Project).all()
+    response = []
+
+    for project in projects:
+
+        # 1️⃣ Get all contributions for this project
+        contributions = db.query(models.Contributions).filter(
+            models.Contributions.project_id == project.project_id
+        ).all()
+
+        if not contributions:
+            continue
+
+        # 2️⃣ Aggregate user units
+        user_units = defaultdict(float)
+
+        for c in contributions:
+            user_units[c.user_id] += c.contribution_units
+
+        total_units = sum(user_units.values())
+
+        users_data = []
+
+        # 3️⃣ Calculate equity %
+        for user_id, units in user_units.items():
+
+            user = db.query(models.Users).filter(
+                models.Users.id == user_id
+            ).first()
+
+            equity_percentage = (
+                (units / total_units) * 100
+                if total_units > 0 else 0
+            )
+
+            users_data.append({
+                "user_id": user_id,
+                "name": user.name if user else "Unknown",
+                "units": round(units, 2),
+                "equity": round(equity_percentage, 2)
+            })
+
+        # 4️⃣ Save/update Equity table (optional but recommended)
+        for user in users_data:
+
+            existing = db.query(models.Equity).filter(
+                models.Equity.user_id == user["user_id"],
+                models.Equity.project_id == project.project_id
+            ).first()
+
+            if existing:
+                existing.total_units = user["units"]
+                existing.equity_percentage = user["equity"]
+            else:
+                new_equity = models.Equity(
+                    user_id=user["user_id"],
+                    project_id=project.project_id,
+                    total_units=user["units"],
+                    equity_percentage=user["equity"]
+                )
+                db.add(new_equity)
+
+        db.commit()
+
+        # 5️⃣ Append response
+        response.append({
+            "project_id": project.project_id,
+            "project_name": project.project_name,
+            "total_units": total_units,
+            "users": users_data
+        })
+
+    return response

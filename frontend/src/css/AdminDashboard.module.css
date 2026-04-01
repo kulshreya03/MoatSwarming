@@ -405,3 +405,73 @@
   background: rgba(34,197,94,0.2);
   color: #22c55e;
 }
+
+
+/* EQUITY PROJECT CARD */
+.equityProjectCard {
+  background: rgba(255,255,255,0.05);
+  padding: 25px;
+  border-radius: 18px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: 0.3s;
+}
+
+.equityProjectCard:hover {
+  transform: translateY(-5px);
+  background: rgba(255,255,255,0.08);
+}
+
+.projectTitle {
+  margin-bottom: 20px;
+  color: #60a5fa;
+}
+
+/* GRID */
+.equityGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 20px;
+}
+
+/* USER CARD */
+.equityUserCard {
+  background: rgba(255,255,255,0.06);
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: 0.25s;
+}
+
+.equityUserCard:hover {
+  transform: scale(1.03);
+  background: rgba(255,255,255,0.1);
+}
+
+.equityUserCard h3 {
+  margin-bottom: 10px;
+}
+
+/* PROGRESS BAR */
+.equityBarContainer {
+  width: 100%;
+  height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.equityBar {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #22c55e);
+  transition: width 0.5s ease;
+}
+
+/* INFO */
+.equityInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: 0.85;
+}

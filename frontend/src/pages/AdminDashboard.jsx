@@ -15,6 +15,7 @@ export function AdminDashboard() {
   });
   const [generatedTasks, setGeneratedTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
+  const [equityData, setEquityData] = useState([]);
 
   const [stats, setStats] = useState({
     totalProjects: 0,
@@ -186,6 +187,27 @@ export function AdminDashboard() {
     }
     };
 
+
+    //Equity Data
+    const fetchEquity = async () => {
+
+      setLoading(true);
+
+      try {
+        const response = await fetch(
+          "http://localhost:8000/admin/equity-distribution"
+        );
+
+        const data = await response.json();
+        setEquityData(data);
+
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -228,6 +250,13 @@ export function AdminDashboard() {
             fetchUsers();
             }}>
             👥 Manage Users
+        </button>
+
+        <button onClick={() => {
+          setActiveTab("equity");
+          fetchEquity();
+          }}>
+          💰 Equity Distribution
         </button>
 
       </div>
@@ -579,6 +608,64 @@ export function AdminDashboard() {
 
             ))}
         </>
+        )}
+
+        {/* EQUITY DISTRIBUTION */}
+        {activeTab === "equity" && (
+        <>
+          <h1 className={styles.title}>Equity Distribution 💰</h1>
+
+          {loading && (
+            <div className={styles.loaderContainer}>
+              <div className={styles.loader}></div>
+              <p>Calculating equity...</p>
+            </div>
+          )}
+
+          {equityData.length === 0 && !loading && (
+            <p className={styles.empty}>
+              No equity data available
+            </p>
+          )}
+
+          {equityData.map((project) => (
+
+            <div key={project.project_id} className={styles.equityProjectCard}>
+
+              <h2 className={styles.projectTitle}>
+                🚀 {project.project_name}
+              </h2>
+
+              <div className={styles.equityGrid}>
+
+                {project.users.map((user) => (
+
+                  <div key={user.user_id} className={styles.equityUserCard}>
+
+                    <h3>{user.name}</h3>
+
+                    <div className={styles.equityBarContainer}>
+                      <div
+                        className={styles.equityBar}
+                        style={{ width: `${user.equity}%` }}
+                      ></div>
+                    </div>
+
+                    <div className={styles.equityInfo}>
+                      <span>{user.equity.toFixed(2)}%</span>
+                      <span>{user.total_units} units</span>
+                    </div>
+
+                  </div>
+
+                ))}
+
+        </div>
+
+      </div>
+
+    ))}
+  </>
         )}
 
       </div>
