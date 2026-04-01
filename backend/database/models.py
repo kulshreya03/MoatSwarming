@@ -1,5 +1,5 @@
 from database.database import Base
-from sqlalchemy import UUID, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import UUID, Column, ForeignKey, Integer, String, DateTime, Float
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 
@@ -60,6 +60,29 @@ class TaskCompleted(Base):
     task_description = Column(String)
     github_repo = Column(String)
     completed_at = Column(DateTime, default=datetime.utcnow)
+
+class Contributions(Base):
+    __tablename__ = "contributions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    project_id = Column(Integer, ForeignKey("projects.project_id"))
+    task_id = Column(Integer, ForeignKey("project_tasks.task_id"))
+
+    contribution_units = Column(Float, default=1.0)  # slicing pie units
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class Equity(Base):
+    __tablename__ = "equity"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    project_id = Column(Integer, ForeignKey("projects.project_id"))
+
+    total_units = Column(Float)
+    equity_percentage = Column(Float)
+
+    updated_at = Column(DateTime, default=datetime.utcnow)
 '''
 class UserSkills(Base):
     __tablename__ = 'user_skills'

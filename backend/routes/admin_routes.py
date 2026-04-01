@@ -8,6 +8,8 @@ from typing import List
 from collections import defaultdict
 from pydantic import BaseModel
 from agents.task_decompose import task_decompose
+from agents.equity_distributer import equity_distributer
+import json
 
 router = APIRouter(prefix="/admin",tags=["Admin Dashboard Management"])
 
@@ -206,9 +208,11 @@ def create_project(request: ProjectCreateRequest, db: Session = Depends(get_db))
         print("🔥 FINAL ERROR:", str(e))
         raise HTTPException(status_code=500, detail=str(e))
 
+
 class TaskUpdateRequest(BaseModel):
     task_id: int
 
+#Complete task and calculate equity
 @router.put("/update-task-status")
 async def update_task_status(
     request: TaskUpdateRequest,
@@ -220,14 +224,26 @@ async def update_task_status(
         models.ProjectTasks.task_id == request.task_id
     ).first()
 
-    # 2️⃣ Not found
     if not task:
         raise HTTPException(
             status_code=404,
             detail=f"Task with id {request.task_id} not found"
         )
 
-    # 3️⃣ Update status
+    # 2️⃣ Get assigned user BEFORE deletion
+    assignment = db.query(models.TaskAssignments).filter(
+        models.TaskAssignments.task_id == task.task_id
+    ).first()
+
+    if not assignment:
+        raise HTTPException(
+            status_code=400,
+            detail="No user assigned to this task"
+        )
+
+    user_id = assignment.user_id
+
+    # 3️⃣ Mark completed
     task.status = "completed"
 
     # 4️⃣ Move to completed table
@@ -237,17 +253,68 @@ async def update_task_status(
         task_description=task.task_description,
         github_repo=task.github_repo
     )
-
     db.add(completed_task)
 
-    # 5️⃣ Remove from assignments (IMPORTANT)
+    # 5️⃣ ✅ Add contribution entry (SLICING PIE UNIT)
+    contribution = models.Contributions(
+        user_id=user_id,
+        project_id=task.project_id,
+        task_id=task.task_id,
+        contribution_units=1.0   # each task = 1 slice (can improve later)
+    )
+    db.add(contribution)
+
+    # 6️⃣ Remove assignment
     db.query(models.TaskAssignments).filter(
         models.TaskAssignments.task_id == task.task_id
     ).delete()
 
     db.commit()
 
-    return {"message": "Task marked as completed"}
+    # 7️⃣ ✅ Fetch all contributions for project
+    contributions = db.query(models.Contributions).filter(
+        models.Contributions.project_id == task.project_id
+    ).all()
+
+    contribution_data = [
+        {
+            "user_id": c.user_id,
+            "units": c.contribution_units
+        }
+        for c in contributions
+    ]
+
+    # 8️⃣ 🤖 Call AI Agent
+    equity_result = equity_distributer(contribution_data)
+
+    # 9️⃣ Parse response
+    equity_result = json.loads(equity_result)
+
+    # 🔟 Update Equity Table
+    for entry in equity_result:
+        existing = db.query(models.Equity).filter(
+            models.Equity.user_id == entry["user_id"],
+            models.Equity.project_id == task.project_id
+        ).first()
+
+        if existing:
+            existing.total_units = entry["total_units"]
+            existing.equity_percentage = entry["equity"]
+        else:
+            new_equity = models.Equity(
+                user_id=entry["user_id"],
+                project_id=task.project_id,
+                total_units=entry["total_units"],
+                equity_percentage=entry["equity"]
+            )
+            db.add(new_equity)
+
+    db.commit()
+
+    return {
+        "message": "Task completed + equity updated",
+        "equity": equity_result
+    }
 
 
 @router.get("/completed-tasks")
