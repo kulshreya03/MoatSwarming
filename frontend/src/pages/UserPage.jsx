@@ -16,6 +16,8 @@ export function UserPage() {
   const [mode, setMode] = useState("choose"); 
   const [editText, setEditText] = useState("");
 
+  const [equityData, setEquityData] = useState([]);
+
 
   /* ---- LOGOUT --- */
   function handleLogout() 
@@ -225,6 +227,22 @@ export function UserPage() {
           View Tasks
         </button>
 
+        <button
+          onClick={async () => {
+            setMode("equity");
+
+            const res = await fetch(
+              `http://localhost:8000/user/equity/${userId}`
+            );
+
+            const data = await res.json();
+            setEquityData(data);
+          }}
+          className={styles.secondaryButton}
+        >
+          💰 View My Equity
+        </button>
+
       </div>
 
 
@@ -292,6 +310,62 @@ export function UserPage() {
       {/* -------- VIEW MODE -------- */}
 
       {mode === "view" && renderSkills()}
+
+      {/* EQUITY MODE */}
+
+      {mode === "equity" && (
+      <div className={styles.equitySection}>
+
+        <h2 className={styles.equityTitle}>
+          💰 Your Equity Across Projects
+        </h2>
+
+        {equityData.length === 0 && (
+          <p className={styles.noEquity}>
+            No contributions yet. Start building 🚀
+          </p>
+        )}
+
+        <div className={styles.equityGrid}>
+          {equityData.map((item, index) => (
+
+            <div key={index} className={styles.equityCard}>
+
+              <h3 className={styles.projectName}>
+                {item.project_name}
+              </h3>
+
+              <div className={styles.equityStats}>
+
+                <div>
+                  <span className={styles.labelSmall}>Units</span>
+                  <p>{item.units}</p>
+                </div>
+
+                <div>
+                  <span className={styles.labelSmall}>Equity</span>
+                  <p className={styles.equityValue}>
+                    {item.equity}%
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Progress bar */}
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${item.equity}%` }}
+                ></div>
+              </div>
+
+            </div>
+
+          ))}
+        </div>
+
+      </div>
+    )}
 
     </div>
   );

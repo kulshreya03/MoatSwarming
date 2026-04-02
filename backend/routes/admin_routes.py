@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.database import SessionLocal
 import database.models as models
-from sqlalchemy.orm import Session
 from services.github_mcp_service import get_commit_counts
 from typing import List
 from collections import defaultdict

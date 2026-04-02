@@ -217,3 +217,87 @@
 .logoutButton:hover {
   background-color: #d9363e;
 }
+
+
+/* EQUITY SECTION */
+
+.equitySection {
+  margin-top: 40px;
+}
+
+.equityTitle {
+  font-size: 26px;
+  margin-bottom: 20px;
+  color: #60a5fa;
+}
+
+.noEquity {
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+/* GRID */
+
+.equityGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+
+.equityCard {
+  padding: 20px;
+  border-radius: 16px;
+
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+
+  transition: all 0.25s ease;
+}
+
+.equityCard:hover {
+  transform: translateY(-4px);
+  background: rgba(255,255,255,0.12);
+}
+
+/* PROJECT NAME */
+
+.projectName {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* STATS */
+
+.equityStats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.labelSmall {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.equityValue {
+  font-size: 20px;
+  font-weight: bold;
+  color: #22c55e;
+}
+
+/* PROGRESS BAR */
+
+.progressBar {
+  height: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  transition: width 0.4s ease;
+}
