@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Form
 from pydantic import BaseModel
+from typing import Dict
 from typing import Annotated, List
 from fastapi import UploadFile, File
 import PyPDF2
@@ -9,6 +10,7 @@ import database.models as models
 from sqlalchemy.orm import Session
 from state import state
 from agents.skill_match import match_skills_to_tasks
+from datetime import datetime
 
 from services.github_mcp_service import get_commit_counts
 #from service.github_mcp_service import get_commit_count
@@ -92,11 +94,14 @@ def get_user_skills(user_id:int, db:Session = Depends(get_db)):
 
     return {"skills": skills.skills}
 
+class UserSkillsUpdate(BaseModel):
+    skills: Dict[str, List[str]]
+
 #Edit skills
-@router.put("/user/skills")
+@router.put("/user/skills/{user_id}")
 async def update_skills(
     user_id:int,
-    skills:dict,
+    payload:UserSkillsUpdate,
     db:Session = Depends(get_db)
 ):
 
@@ -104,11 +109,25 @@ async def update_skills(
         models.UserSkills.user_id == user_id
     ).first()
 
-    record.skills = skills
+    if not record:
+        record = models.UserSkills(
+            user_id=user_id,
+            skills=payload.skills,
+            updated_at=datetime.utcnow()
+        )
+
+        db.add(record)
+
+    else:
+        record.skills = payload.skills
+        record.updated_at = datetime.utcnow()
 
     db.commit()
 
-    return {"message":"skills updated"}
+    return {
+        "message": "skills updated",
+        "skills": record.skills
+    }
 
 @router.get("/view-tasks/{user_id}")
 async def view_tasks(user_id:int, db: Session = Depends(get_db)):

@@ -116,14 +116,13 @@ export function UserPage() {
     }
 
     const response = await fetch(
-      "http://localhost:8000/agent/user/skills",
+      `http://localhost:8000/agent/user/skills/${userId}`,
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_id: userId,
           skills: parsed
         })
       }

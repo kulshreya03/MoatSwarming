@@ -15,7 +15,7 @@ class Users(Base):
 class Project(Base):
     __tablename__ = 'projects'
     
-    project_id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     project_name = Column(String, index=True)
     
 class ProjectTasks(Base):
