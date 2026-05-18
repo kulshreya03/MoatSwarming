@@ -6,91 +6,32 @@ from state import state
 from langchain_core.messages import HumanMessage
 import json
 import re
-
-models.Base.metadata.create_all(bind=engine)
-
-#Coonect to DB
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+from tools.task_match_tool import fetch_matching_tasks
+from langchain.agents import create_agent
 
 
+def match_skills_to_tasks(user_id:int):
 
-def match_skills_to_tasks(db:Session, user_id:int):
-
-    #Check if status is pending, display task only if status:pending
-    tasks = db.query(models.ProjectTasks).filter(models.ProjectTasks.status == "pending").all()
-    #print(tasks)
-
-    # Convert tasks to list
-    task_list = []
-    for task in tasks:
-            task_list.append({
-                "task_id": task.task_id,
-                "project_id": task.project_id,
-                "task_description": task.task_description,
-                "github_repo": task.github_repo,
-                "status": task.status
-            })    
-    print("Task List:", task_list)
-
-    #resume_skills = state["resume_skills"]
-    #print(resume_skills)
-    user_skills = db.query(models.UserSkills).filter(
-        models.UserSkills.user_id == user_id
-    ).first()
-    if not user_skills:
-        return []
-    resume_skills = user_skills.skills
-
-    if not resume_skills:
-        return []
-
-    # Flatten categorized skills → single list
-    #flat_skills = state["flat_skills"]
-    flat_skills = []
-
-    for category in resume_skills.values():
-        flat_skills.extend([s.lower() for s in category])
-    print("Resume skills:", flat_skills)
-
-
-    #New Additions
-    skill_lookup = set(flat_skills)
-
-    filtered_tasks = []
-
-    for task in task_list:
-        text = task["task_description"].lower()
-
-        tokens = re.findall(r"[a-zA-Z0-9\.\-]+", text)
-
-        if any(skill in tokens for skill in skill_lookup):
-            filtered_tasks.append(task)
-
-    # if nothing matched, fallback to all tasks
-    if not filtered_tasks:
-        filtered_tasks = task_list
+    tools = [fetch_matching_tasks]
+    agent = create_agent(model=llm,tools=tools)
 
     prompt = f"""
 You are a Skill-Task Matching Engine.
 
 Match resume skills with project tasks.
 
+Your Task:
 Return ONLY tasks that match the resume skills.
 
-------------------------
-RESUME SKILLS
-------------------------
-{flat_skills}
+First call the tool:
+fetch_matching_tasks
 
-------------------------
-PROJECT TASKS
-------------------------
-{json.dumps(filtered_tasks, indent=2)}
+Input:
+user_id = {user_id}
+
+The tool returns:
+- resume_skills
+- filtered_tasks
 
 ------------------------
 MATCHING RULES
@@ -126,12 +67,40 @@ Return ONLY JSON.
 Do NOT return tasks with no matching skills.
 """
 
+    
 
-    response = llm.invoke([HumanMessage(content=prompt)])
+    response = agent.invoke({
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    })
     try:
-        content = re.sub(r"```json|```", "", response.content).strip()
+        final_message = response["messages"][-1].content
+
+        print("RAW MESSAGE:", final_message)
+
+        # Extract actual text from LangChain content blocks
+        if isinstance(final_message, list):
+
+            text_output = ""
+
+            for item in final_message:
+
+                if item.get("type") == "text":
+                    text_output += item.get("text", "")
+
+        else:
+            text_output = final_message
+
+        # Remove markdown json fences
+        content = re.sub(r"```json|```", "", text_output).strip()
+
+        print("CLEANED CONTENT:", content)
+
         matched_tasks = json.loads(content)
-        print(response.content)
     except Exception:
         matched_tasks = []
 

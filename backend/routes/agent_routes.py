@@ -134,7 +134,7 @@ async def view_tasks(user_id:int, db: Session = Depends(get_db)):
     """Fetch all tasks from the database"""
     #db = SessionLocal()
     try:
-        tasks = match_skills_to_tasks(db,user_id)
+        tasks = match_skills_to_tasks(user_id)
         if not tasks:
             return []
         return tasks
