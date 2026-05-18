@@ -12,3 +12,5 @@ python-multipart
 PyPDF2
 # MCP (Model Context Protocol) client
 mcp>=1.0.0
+
+fastmcp

@@ -70,6 +70,7 @@ The backend has evolved beyond a simple "main.py"; it now includes state managem
 - **LangGraph** - Graph-based agent orchestration
 - **Google Generative AI** - AI model provider
 - **PyPDF2** - PDF processing for resume extraction
+- **Langsmith** - trace and tool-call tracking for agent execution and MCP interactions
 - **MCP (Model Context Protocol)** - GitHub integration client
 - **GitHub MCP service** - Integration for agent coordination and commit analytics
 
@@ -90,6 +91,7 @@ The backend has evolved beyond a simple "main.py"; it now includes state managem
 - **AI-Powered Task Decomposition** – Automatically generate project tasks using LLM when creating new projects.
 - **Skill Matching Algorithm** – Intelligent matching of user skills to project tasks using both rule-based and AI-powered approaches.
 - **GitHub Integration** – Real-time commit count tracking via MCP for progress monitoring.
+- **Langsmith Tracing** – Uses Langsmith to capture execution traces and MCP tool calls across agent workflows.
 - **Modular Backend** – State management, graph utilities, and LLM integration in separate modules.
 - **Database Layer** – SQLAlchemy models with Alembic migrations and a documented schema in `database/db_schema.txt`.
 - **Frontend Structure** – React pages organized with CSS modules for admin/user workflows; real-time data fetched from backend APIs.
