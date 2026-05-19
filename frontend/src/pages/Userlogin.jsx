@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import styles from "../css/Userlogin.module.css";
 
@@ -8,6 +8,14 @@ export function UserLogin() {
   const [password,setPassword]=useState("")
   const[error,setError]=useState("")  
   //const BACKEND_URL = "http://localhost:8000";
+
+  useEffect(() => {
+    const token = localStorage.getItem("user_id");
+
+    if (token) {
+      navigate("/UserPage");
+    }
+  }, [navigate]);
 
   function handleEmail(event)
   {
