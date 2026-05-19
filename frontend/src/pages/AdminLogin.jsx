@@ -9,6 +9,10 @@ export function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+      document.title = "Admin Login";
+    }, []);
+
   function handleEmail(event) {
     setEmail(event.target.value);
   }

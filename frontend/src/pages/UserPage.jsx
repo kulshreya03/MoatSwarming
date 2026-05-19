@@ -18,6 +18,10 @@ export function UserPage() {
 
   const [equityData, setEquityData] = useState([]);
 
+  useEffect(() => {
+    document.title = "User Page";
+  }, []);
+
 
   /* ---- LOGOUT --- */
   function handleLogout() 

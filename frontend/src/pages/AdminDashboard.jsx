@@ -35,6 +35,10 @@ export function AdminDashboard() {
     });
   };
 
+  useEffect(() => {
+    document.title = "Admin Dashboard";
+  }, []);
+
   // 🔹 CREATE PROJECT + CALL AI
   const handleCreateProject = async () => {
 

@@ -10,6 +10,10 @@ export function UserLogin() {
   //const BACKEND_URL = "http://localhost:8000";
 
   useEffect(() => {
+    document.title = "User Login";
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem("user_id");
 
     if (token) {

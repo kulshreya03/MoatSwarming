@@ -9,7 +9,9 @@ export function TasksPage() {
 
   const userId = localStorage.getItem("user_id");
 
-  
+  useEffect(() => {
+    document.title = "Tasks Page";
+  }, []);
     const fetchTasks = async () => {
       try {
         const response = await fetch(
