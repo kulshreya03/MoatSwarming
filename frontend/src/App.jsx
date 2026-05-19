@@ -19,7 +19,6 @@ function App() {
               <Route path="/UserPage" element={<UserPage/>}></Route>
               <Route path="/TasksPage" element={<TasksPage/>}></Route>
               <Route path="/AdminLogin" element={<AdminLogin/>}> </Route>
-              <Route path="/AdminPage" element={<AdminPage/>}></Route>
               <Route path="/AdminDashboard" element={<AdminDashboard/>}></Route>
           </Routes>
         </BrowserRouter>
