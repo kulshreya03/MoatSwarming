@@ -128,6 +128,7 @@ class ProjectCreateRequest(BaseModel):
     github_repo: str
 
 @router.post("/create-project")
+@traceable
 def create_project(request: ProjectCreateRequest, db: Session = Depends(get_db)):
 
     try:
