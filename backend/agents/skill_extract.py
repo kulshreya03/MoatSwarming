@@ -3,6 +3,7 @@ import json
 import re
 from langchain_core.messages import HumanMessage
 from state import state
+from langsmith import traceable
 
 
 def normalize_skill(skill: str) -> str:
@@ -22,7 +23,6 @@ def normalize_skill(skill: str) -> str:
     }
 
     return synonym_map.get(skill, skill)
-
 
 def python_skill_matcher(skills_dict):
     """
@@ -44,7 +44,7 @@ def python_skill_matcher(skills_dict):
 
     return flat_skills, skill_set
 
-
+@traceable
 def extract_skills_from_text(resume_text: str):
 
     prompt = f"""

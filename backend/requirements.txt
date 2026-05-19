@@ -14,3 +14,4 @@ PyPDF2
 mcp>=1.0.0
 
 fastmcp
+langsmith

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database.database import SessionLocal
 import database.models as models
+from langsmith import traceable
 
 router = APIRouter(prefix="/user",tags=["User Management"])
 
@@ -14,6 +15,7 @@ def get_db():
         db.close()
 
 @router.get("/equity/{user_id}")
+@traceable
 async def get_user_equity(user_id: int, db: Session = Depends(get_db)):
     """
     Returns all projects where user has equity

@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from state import state
 from agents.skill_match import match_skills_to_tasks
 from datetime import datetime
+from langsmith import traceable
 
 from services.github_mcp_service import get_commit_counts
 #from service.github_mcp_service import get_commit_count
@@ -48,6 +49,7 @@ class OngoingTaskResponse(BaseModel):
 
 
 @router.post("/extract-skills")
+@traceable
 async def extract_skills(
     resume:UploadFile = File(...),
     user_id: int = Form(...),
@@ -83,6 +85,7 @@ async def extract_skills(
 
 #Fetch previously saved skills
 @router.get("/user/skills/{user_id}")
+@traceable
 def get_user_skills(user_id:int, db:Session = Depends(get_db)):
 
     skills = db.query(models.UserSkills).filter(
@@ -99,6 +102,7 @@ class UserSkillsUpdate(BaseModel):
 
 #Edit skills
 @router.put("/user/skills/{user_id}")
+@traceable
 async def update_skills(
     user_id:int,
     payload:UserSkillsUpdate,
@@ -144,6 +148,7 @@ async def view_tasks(user_id:int, db: Session = Depends(get_db)):
 
 #Admin Route
 @router.get("/view-ongoing-tasks", response_model=List[OngoingTaskResponse])
+@traceable
 async def view_ongoing_tasks(db: Session = Depends(get_db)):
 
     tasks = db.query(models.ProjectTasks)\

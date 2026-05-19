@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from agents.task_decompose import task_decompose
 from agents.equity_distributer import equity_distributer
 import json
+from langsmith import traceable
 
 router = APIRouter(prefix="/admin",tags=["Admin Dashboard Management"])
 
@@ -21,6 +22,7 @@ def get_db():
         db.close()
 
 @router.get("/dashboard")
+@traceable
 async def get_admin_dashboard(db: Session = Depends(get_db)):
 
     # 1️⃣ Get all tasks
@@ -70,6 +72,7 @@ async def get_admin_dashboard(db: Session = Depends(get_db)):
     }
 
 @router.get("/users-with-tasks")
+@traceable
 async def get_users_with_tasks(db: Session = Depends(get_db)):
 
     users = db.query(models.Users).all()
@@ -213,6 +216,7 @@ class TaskUpdateRequest(BaseModel):
 
 #Complete task and calculate equity
 @router.put("/update-task-status")
+@traceable
 async def update_task_status(
     request: TaskUpdateRequest,
     db: Session = Depends(get_db)
@@ -317,6 +321,7 @@ async def update_task_status(
 
 
 @router.get("/completed-tasks")
+@traceable
 async def get_completed_tasks(db: Session = Depends(get_db)):
 
     tasks = db.query(models.TaskCompleted).all()
@@ -334,6 +339,7 @@ async def get_completed_tasks(db: Session = Depends(get_db)):
     ]
 
 @router.get("/equity-distribution")
+@traceable
 async def get_equity_distribution(db: Session = Depends(get_db)):
     """
     Equity distribution using Contributions table (Slicing Pie method)
