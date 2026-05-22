@@ -196,7 +196,7 @@ export function HomePage() {
 
               </div>
 
-              <button className={styles.btnSearch}>
+              <button className={styles.btnSearch} onClick={redirectAdmin}>
 
                 <span className="material-icons-outlined">
                   arrow_forward

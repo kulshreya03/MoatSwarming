@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../css/AdminLogin.module.css";
 
 export function AdminLogin() {
@@ -12,6 +12,14 @@ export function AdminLogin() {
   useEffect(() => {
       document.title = "Admin Login";
     }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("admin_id");
+
+    if (token) {
+      navigate("/AdminDashboard");
+    }
+  }, [navigate]);
 
   function handleEmail(event) {
     setEmail(event.target.value);
